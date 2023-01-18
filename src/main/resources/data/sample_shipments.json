@@ -1,0 +1,77 @@
+[
+    {
+        "shipmentId": null,
+        "recipient": {
+            "name": "Home Sweet Home",
+            "address": {
+                "postalCode": "98653",
+                "street": "47th Street",
+                "number": "4",
+                "city": "Springfield",
+                "additionalInfo": null
+            }
+        },
+        "sender": {
+            "name": "Warehouse of Unicorns",
+            "address": {
+                "postalCode": "98653",
+                "street": "47th Street",
+                "number": "4",
+                "city": "Townsville",
+                "additionalInfo": null
+            }
+        },
+        "weight": 2.3,
+        "imageLink": null
+    },
+    {
+        "shipmentId": null,
+        "recipient": {
+            "name": "Buddy The Elf",
+            "address": {
+                "postalCode": "938746",
+                "street": "Candy Cane Lane",
+                "number": "1",
+                "city": "North Pole",
+                "additionalInfo": "Santa's Workshop"
+            }
+        },
+        "sender": {
+            "name": "The Grinch",
+            "address": {
+                "postalCode": "69869",
+                "street": "Mount Crumpit",
+                "number": "666",
+                "city": "Whoville",
+                "additionalInfo": "Cave"
+            }
+        },
+        "weight": 0.0,
+        "imageLink": null
+    },
+    {
+        "shipmentId": null,
+        "recipient": {
+            "name": "Walter White",
+            "address": {
+                "postalCode": "ALBQNM",
+                "street": "Negra Arroyo Lane",
+                "number": "308",
+                "city": "Albuquerque",
+                "additionalInfo": "RV storage"
+            }
+        },
+        "sender": {
+            "name": "Tony Stark",
+            "address": {
+                "postalCode": "NYCNY",
+                "street": "Avenue of the Americas",
+                "number": "64",
+                "city": "New York City",
+                "additionalInfo": "Stark Tower"
+            }
+        },
+        "weight": 0.0,
+        "imageLink": null
+    }
+]

@@ -1,10 +1,10 @@
-package dev.ancaghenade.userprofiledemo;
+package dev.ancaghenade.shipmentlistdemo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserProfileDemoApplicationTests {
+class ShipmentListDemoApplicationTests {
 
   @Test
   void contextLoads() {

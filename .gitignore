@@ -31,3 +31,27 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Frontend ###
+
+# dependencies
+src/main/shipment-list-frontend/node_modules
+src/main/shipment-list-frontend/.pnp
+src/main/shipment-list-frontend/.pnp.js
+
+# testing
+src/main/shipment-list-frontend/coverage
+
+# production
+src/main/shipment-list-frontend/build
+
+# misc
+src/main/shipment-list-frontend/.DS_Store
+src/main/shipment-list-frontend/.env.local
+src/main/shipment-list-frontend/.env.development.local
+src/main/shipment-list-frontend/.env.test.local
+src/main/shipment-list-frontend/.env.production.local
+
+src/main/shipment-list-frontend/npm-debug.log*
+src/main/shipment-list-frontend/yarn-debug.log*
+src/main/shipment-list-frontend/yarn-error.log*

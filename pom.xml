@@ -3,31 +3,67 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.0.1</version>
-    <relativePath/> <!-- lookup parent from repository -->
   </parent>
+
   <groupId>dev.ancaghenade</groupId>
   <artifactId>user-profile-demo</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
   <name>user-profile-demo</name>
-  <description>user-profile-demo</description>
+  <description>User Profile Service</description>
+
   <properties>
     <java.version>17</java.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
+<!--    <checkstyle.version>10.5.0</checkstyle.version>-->
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <com.amazonaws.s3-sdk>1.12.376</com.amazonaws.s3-sdk>
   </properties>
+
+
+  <!--    Dependencies-->
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+      <version>${com.amazonaws.s3-sdk}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-dynamodb</artifactId>
+      <version>1.12.383</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.dynamobee</groupId>
+      <artifactId>dynamobee</artifactId>
+      <version>0.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-logging</artifactId>
+    </dependency>
+    <!--     Test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -49,7 +85,38 @@
           </excludes>
         </configuration>
       </plugin>
+
+<!--            TBD? -->
+      <!--      <plugin>-->
+      <!--        <groupId>org.apache.maven.plugins</groupId>-->
+      <!--        <artifactId>maven-checkstyle-plugin</artifactId>-->
+      <!--        <version>${maven-checkstyle-plugin.version}</version>-->
+      <!--        <dependencies>-->
+      <!--          <dependency>-->
+      <!--            <groupId>com.puppycrawl.tools</groupId>-->
+      <!--            <artifactId>checkstyle</artifactId>-->
+      <!--            <version>${checkstyle.version}</version>-->
+      <!--          </dependency>-->
+      <!--        </dependencies>-->
+      <!--        <configuration>-->
+      <!--          <configLocation>google_checks.xml</configLocation>-->
+      <!--          <encoding>UTF-8</encoding>-->
+      <!--          <consoleOutput>true</consoleOutput>-->
+      <!--          <failsOnError>true</failsOnError>-->
+      <!--          <linkXRef>false</linkXRef>-->
+      <!--          <violationSeverity>warning</violationSeverity>-->
+      <!--        </configuration>-->
+      <!--        <executions>-->
+      <!--          <execution>-->
+      <!--            <id>validate</id>-->
+      <!--            <phase>validate</phase>-->
+      <!--            <goals>-->
+      <!--              <goal>check</goal>-->
+      <!--            </goals>-->
+      <!--          </execution>-->
+      <!--        </executions>-->
+      <!--      </plugin>-->
     </plugins>
   </build>
-
 </project>
+

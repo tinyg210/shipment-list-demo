@@ -1,0 +1,17 @@
+server:
+  port: 8081
+
+servlet:
+  multipart-max-file-size: 50MB
+
+logging:
+  level:
+    root=debug:
+
+aws:
+  access:
+    key: YOUR_AWS_ACCESS_KEY
+    secret-key: YOUR_AWS_SECRET_KEY
+  dynamodb:
+    endpoint: https://dynamodb.eu-central-1.amazonaws.com
+  region: eu-central-1
