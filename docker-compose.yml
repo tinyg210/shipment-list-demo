@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    ports:
+      - "4566:4566" # port of to where localstack can be addressed to
+      - "9000:9000"
+    environment:
+      - SERVICES=s3,dynamodb # a list of desired services you want to use.
+      - DEFAULT_REGION=eu-central-1 # where the localstack mocks to be running
+      - AWS_ACCESS_KEY_ID=test_access_key
+      - AWS_SECRET_ACCESS_KEY=test_secret_access_key
+      - DATA_DIR=/tmp/localstack/data
+      - PORT_WEB_UI=9000
+      - LAMBDA_EXECUTOR=local
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - START_WEB=1

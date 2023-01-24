@@ -43,7 +43,7 @@ public class S3StorageService {
     } catch (AmazonServiceException e) {
       throw new IllegalStateException("Failed to download file.", e);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      return new byte[0];
     }
   }
 }

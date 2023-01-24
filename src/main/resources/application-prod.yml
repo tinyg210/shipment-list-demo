@@ -9,9 +9,11 @@ logging:
     root=debug:
 
 aws:
-  access:
-    key: YOUR_AWS_ACCESS_KEY
-    secret-key: YOUR_AWS_SECRET_KEY
+  credentials:
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
   dynamodb:
     endpoint: https://dynamodb.eu-central-1.amazonaws.com
+  s3:
+    endpoint: https://s3.eu-central-1.amazonaws.com
   region: eu-central-1

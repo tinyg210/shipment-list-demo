@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # For demo purpose only;
-# Access key and secret key are set and using `aws configure` to manage the aws cli on your local machine
+# Access key and secret key are set and using `aws configure`
+# to manage the aws cli on your local machine
 
 # Set the name of the S3 bucket
 bucket_name="shipment-list-demo-bucket"

@@ -16,10 +16,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DynamoDBConfiguration {
 
-  @Value("${aws.access.key}")
+  @Value("${aws.credentials.access-key}")
   private String awsAccessKey;
 
-  @Value("${aws.access.secret-key}")
+  @Value("${aws.credentials.secret-key}")
   private String awsSecretKey;
 
   @Value("${aws.dynamodb.endpoint}")
@@ -48,8 +48,7 @@ public class DynamoDBConfiguration {
                 awsRegion
             )
         )
-        .withCredentials(
-            (awsAccessKey == null && awsSecretKey == null) ? null : amazonAWSCredentialsProvider())
+        .withCredentials(amazonAWSCredentialsProvider())
         .build();
   }
 

@@ -41,7 +41,7 @@ public class ShipmentController {
 
 
   @GetMapping(
-      path = "{shipmentId}/image/download")
+      path = "{shipmentId}/image/download", produces = MediaType.IMAGE_JPEG_VALUE)
   public byte[] downloadShipmentImage(@PathVariable("shipmentId") String shipmentId) {
    return shipmentService.downloadShipmentImage(shipmentId);
   }

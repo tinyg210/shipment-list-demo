@@ -1,4 +1,12 @@
 server:
   port: 8081
 
-//  Localstack TODO + add Lambda
+aws:
+  credentials:
+    access-key: test_access_key
+    secret-key: test_secret_access_key
+  s3:
+    endpoint: https://s3.localhost.localstack.cloud:4566/
+  dynamodb:
+    endpoint: https://dynamodb.localhost.localstack.cloud:4566/
+  region: eu-central-1
