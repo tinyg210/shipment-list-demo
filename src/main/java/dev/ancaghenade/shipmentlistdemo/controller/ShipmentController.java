@@ -6,6 +6,7 @@ import dev.ancaghenade.shipmentlistdemo.service.ShipmentService;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,11 @@ public class ShipmentController {
     return shipmentService.getAllShipments();
   }
 
+  @DeleteMapping("/{shipmentId}")
+  public String deleteShipment(@PathVariable("shipmentId") String shipmentId) {
+    return shipmentService.deleteShipment(shipmentId);
+  }
+
   @PostMapping(
       path = "{shipmentId}/image/upload",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -43,6 +49,6 @@ public class ShipmentController {
   @GetMapping(
       path = "{shipmentId}/image/download", produces = MediaType.IMAGE_JPEG_VALUE)
   public byte[] downloadShipmentImage(@PathVariable("shipmentId") String shipmentId) {
-   return shipmentService.downloadShipmentImage(shipmentId);
+    return shipmentService.downloadShipmentImage(shipmentId);
   }
 }

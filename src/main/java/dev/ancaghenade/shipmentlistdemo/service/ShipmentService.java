@@ -7,7 +7,9 @@ import dev.ancaghenade.shipmentlistdemo.buckets.BucketName;
 import dev.ancaghenade.shipmentlistdemo.entity.Shipment;
 import dev.ancaghenade.shipmentlistdemo.repository.S3StorageService;
 import dev.ancaghenade.shipmentlistdemo.repository.ShipmentRepository;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,10 @@ public class ShipmentService {
 
   public List<Shipment> getAllShipments() {
     return shipmentRepository.getAllShipments();
+  }
+
+  public String deleteShipment(String shipmentId) {
+   return shipmentRepository.delete(shipmentId);
   }
 
   public Shipment saveShipment(Shipment shipment) {
@@ -69,9 +75,13 @@ public class ShipmentService {
 
     String path = format("%s/%s", BucketName.SHIPMENT_PICTURE.getBucketName(),
         shipment.getShipmentId());
-    return Optional.ofNullable(shipment.getImageLink())
-        .map(link -> s3StorageService.download(path, link))
-        .orElse(new byte[0]);
+    try {
+      return Optional.ofNullable(shipment.getImageLink())
+          .map(link -> s3StorageService.download(path, link))
+          .orElse(Files.readAllBytes(new File("src/main/resources/placeholder.jpg").toPath()));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 

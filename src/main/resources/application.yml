@@ -8,12 +8,6 @@ logging:
   level:
     root=debug:
 
-aws:
-  credentials:
-    access-key: ${AWS_ACCESS_KEY_ID}
-    secret-key: ${AWS_SECRET_ACCESS_KEY}
-  dynamodb:
-    endpoint: https://dynamodb.eu-central-1.amazonaws.com
-  s3:
-    endpoint: https://s3.eu-central-1.amazonaws.com
-  region: eu-central-1
+spring:
+  profiles:
+    default: dev

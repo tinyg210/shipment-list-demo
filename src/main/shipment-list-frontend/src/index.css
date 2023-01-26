@@ -14,3 +14,63 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+body {
+  font-family: 'Open Sans', sans-serif;
+  background-color: #f5f5f5;
+
+}
+
+/* Headings */
+h1, h2, h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 36px;
+  margin-bottom: 24px;
+}
+
+h2 {
+  font-size: 30px;
+  margin-bottom: 18px;
+}
+
+h3 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.div-main {
+  display: flex;
+  align-items: center; /* This centers the items vertically */
+  justify-content: center;
+}
+
+/* Paragraphs */
+p {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+
+.btn {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  border-radius: 50px; /* This line changes the button corners to round */
+  padding: 12px 24px;
+  transition: background-color 0.3s ease;
+  text-transform: uppercase;
+  background-color: #e5e023;
+  color: black;
+}
+
+.btn-primary {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+.btn:hover {
+  background-color: #e72525;
+}

@@ -1,12 +1,3 @@
-server:
-  port: 8081
-
-servlet:
-  multipart-max-file-size: 50MB
-
-logging:
-  level:
-    root=debug:
 
 aws:
   credentials:

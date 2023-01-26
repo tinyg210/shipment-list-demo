@@ -6,7 +6,6 @@ services:
     container_name: localstack
     ports:
       - "4566:4566" # port of to where localstack can be addressed to
-      - "9000:9000"
     environment:
       - SERVICES=s3,dynamodb # a list of desired services you want to use.
       - DEFAULT_REGION=eu-central-1 # where the localstack mocks to be running
