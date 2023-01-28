@@ -10,4 +10,4 @@ logging:
 
 spring:
   profiles:
-    default: dev
+    default: prod
