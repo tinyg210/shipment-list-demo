@@ -55,3 +55,9 @@ src/main/shipment-list-frontend/.env.production.local
 src/main/shipment-list-frontend/npm-debug.log*
 src/main/shipment-list-frontend/yarn-debug.log*
 src/main/shipment-list-frontend/yarn-error.log*
+
+# terraform
+
+setup/terraform/terraform.tfstate
+setup/terraform/.terraform.lock.hcl
+setup/terraform/terraform.tfstate.backup
