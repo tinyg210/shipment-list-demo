@@ -3,11 +3,13 @@
 <img src="https://img.shields.io/badge/LocalStack-deploys-4D29B4.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAKgAAACoABZrFArwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAALbSURBVHic7ZpNaxNRFIafczNTGIq0G2M7pXWRlRv3Lusf8AMFEQT3guDWhX9BcC/uFAr1B4igLgSF4EYDtsuQ3M5GYrTaj3Tmui2SpMnM3PlK3m1uzjnPw8xw50MoaNrttl+r1e4CNRv1jTG/+v3+c8dG8TSilHoAPLZVX0RYWlraUbYaJI2IuLZ7KKUWCisgq8wF5D1A3rF+EQyCYPHo6Ghh3BrP8wb1en3f9izDYlVAp9O5EkXRB8dxxl7QBoNBpLW+7fv+a5vzDIvVU0BELhpjJrmaK2NMw+YsIxunUaTZbLrdbveZ1vpmGvWyTOJToNlsuqurq1vAdWPMeSDzwzhJEh0Bp+FTmifzxBZQBXiIKaAq8BBDQJXgYUoBVYOHKQRUER4mFFBVeJhAQJXh4QwBVYeHMQJmAR5GCJgVeBgiYJbg4T8BswYPp+4GW63WwvLy8hZwLcd5TudvBj3+OFBIeA4PD596nvc1iiIrD21qtdr+ysrKR8cY42itCwUP0Gg0+sC27T5qb2/vMunB/0ipTmZxfN//orW+BCwmrGV6vd63BP9P2j9WxGbxbrd7B3g14fLfwFsROUlzBmNM33XdR6Meuxfp5eg54IYxJvXCx8fHL4F3w36blTdDI4/0WREwMnMBeQ+Qd+YC8h4g78wF5D1A3rEqwBiT6q4ubpRSI+ewuhP0PO/NwcHBExHJZZ8PICI/e73ep7z6zzNPwWP1djhuOp3OfRG5kLROFEXv19fXP49bU6TbYQDa7XZDRF6kUUtEtoFb49YUbh/gOM7YbwqnyG4URQ/PWlQ4ASllNwzDzY2NDX3WwioKmBgeqidgKnioloCp4aE6AmLBQzUExIaH8gtIBA/lFrCTFB7KK2AnDMOrSeGhnAJSg4fyCUgVHsolIHV4KI8AK/BQDgHW4KH4AqzCQwEfiIRheKKUAvjuuu7m2tpakPdMmcYYI1rre0EQ1LPo9w82qyNziMdZ3AAAAABJRU5ErkJggg=="> <img src="https://img.shields.io/badge/AWS-deploys-F29100.svg?logo=amazon">
 
 ### Prerequisites
+ ** This demo was conceived and ran on macOS Catalina version 10.15.7. Other operating systems might 
+need slight variations in using command line tools. 
 
 - Maven 3.8.5 & Java 17
 - AWS free tier account
 - Docker - for running LocalStack
-- AWS Command Line Interface - for managing your services
+- Terraform for creating AWS & LocalStack resources
 - npm - for running the frontend app
 
 ## Purpose
@@ -37,18 +39,19 @@ The AWS services involved are:
 ## How we will be using it
 
 We’ll be walking through a few scenarios using the application, and we expect it to maintain the
-behavior in both production and development environments.
+behavior in both production and development environments. This behaviour can be "scientifically" backed up
+by adding integration tests.
+
 We’ll take advantage of one of the core features of the Spring framework that allows us to bind our
 beans to different profiles, such as dev, test, and prod. Of course, these beans need to know how to
 behave in each environment, so they’ll get that information from their designated configuration
-files,
-`application-prod.yml`, and  `application-dev.yml`.
+files, `application-prod.yml`, and  `application-dev.yml`.
 
 ## Running it
 
 ### Production simulation
 
-Now we don’t have a real production environment because that’s not the point here, but most likely,
+Now, we don’t have a real production environment because that’s not the point here, but most likely,
 an application like this runs on a container orchestration platform, and all the necessary configs
 are still provided. Since we’re only simulating a production instance, all the configurations are
 kept in the `application-prod.yml` file.
@@ -60,27 +63,45 @@ needs to be created with the following policies:
 - AWSLambda_FullAccess
 - AmazonDynamoDBFullAccess
 
-The `scripts/new-bucket.sh` script will create the necessary S3 resource.
-
-At startup @dynamobee helps set up the table we need and populate it with some sample data.
-@dynamobee is library for tracking, managing, and applying database changes
-The changelog acts as a database version control. It tracks all the changes made to the database,
-and helps you manage database migration.
-
-To run the backend simply use
-
+We will be using the user's credentials and export them as temporary environment variable with the
+`export` (`set` on Windows) command:
 ```
-mvn spring-boot:run -Dspring-boot.run.profiles=prod
+export AWS_ACCESS_KEY_ID=[your_aws_access_key_id]
+export AWS_SECRET_ACCESS_KEY=[your_aws_secret_access_key_id]
 ```
+Make sure you have Terraform [installed](https://developer.hashicorp.com/terraform/downloads).
+Under setup/terraform run:
+```
+terraform init
+terraform plan
+```
+once these 2 commands run successfully and no errors occur, it's time to run:
+```
+terraform apply --auto-approve
+```
+
+This should create the needed S3 bucket, the DynamoDB `shipment` table and populate it with some sample data.
 
 Now `cd` into `src/main/shipment-list-frontend` and run `npm install` and `npm start`.
 This will spin up the React app that can be accessed on `localhost:3000`.
 
-You should now be able to see a list of shipments with standard icons, that means that only the
-database
-is populated, the pictures still need to be added from the `sample-pictures` folder.
-The weight of a shipment we can perceive, but not the size, that's why we need to display it,
+For running it on Windows, there are some 
+[extra requirements](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/react-on-windows),
+but no worries, it should be straightforward.
+
+Go back to the root folder and run the backend simply by using
+
+```
+mvn spring-boot:run -Dspring-boot.run.profiles=prod
+```
+Notice the `prod` profile is being set via command line arguments.
+
+At `localhost:3000` you should now be able to see a list of shipments with standard icons, 
+that means that only the database is populated, the pictures still need to be added from the 
+`sample-pictures` folder.
+The weight of a shipment we can perceive, but not the size, that's why we need pictures to understand,
 using the "banana for scale" measuring unit. How else would we know??
+
 
 The Lambda function is still not up. This falls under the `shipment-list-lambda-validator` project.
 
