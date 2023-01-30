@@ -11,10 +11,10 @@
   </parent>
 
   <groupId>dev.ancaghenade</groupId>
-  <artifactId>user-profile-demo</artifactId>
+  <artifactId>shipment-list-demo</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-  <name>user-profile-demo</name>
+  <name>shipment-list-demo</name>
   <description>User Profile Service</description>
 
   <properties>
