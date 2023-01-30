@@ -3,8 +3,8 @@
 <img src="https://img.shields.io/badge/LocalStack-deploys-4D29B4.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAKgAAACoABZrFArwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAALbSURBVHic7ZpNaxNRFIafczNTGIq0G2M7pXWRlRv3Lusf8AMFEQT3guDWhX9BcC/uFAr1B4igLgSF4EYDtsuQ3M5GYrTaj3Tmui2SpMnM3PlK3m1uzjnPw8xw50MoaNrttl+r1e4CNRv1jTG/+v3+c8dG8TSilHoAPLZVX0RYWlraUbYaJI2IuLZ7KKUWCisgq8wF5D1A3rF+EQyCYPHo6Ghh3BrP8wb1en3f9izDYlVAp9O5EkXRB8dxxl7QBoNBpLW+7fv+a5vzDIvVU0BELhpjJrmaK2NMw+YsIxunUaTZbLrdbveZ1vpmGvWyTOJToNlsuqurq1vAdWPMeSDzwzhJEh0Bp+FTmifzxBZQBXiIKaAq8BBDQJXgYUoBVYOHKQRUER4mFFBVeJhAQJXh4QwBVYeHMQJmAR5GCJgVeBgiYJbg4T8BswYPp+4GW63WwvLy8hZwLcd5TudvBj3+OFBIeA4PD596nvc1iiIrD21qtdr+ysrKR8cY42itCwUP0Gg0+sC27T5qb2/vMunB/0ipTmZxfN//orW+BCwmrGV6vd63BP9P2j9WxGbxbrd7B3g14fLfwFsROUlzBmNM33XdR6Meuxfp5eg54IYxJvXCx8fHL4F3w36blTdDI4/0WREwMnMBeQ+Qd+YC8h4g78wF5D1A3rEqwBiT6q4ubpRSI+ewuhP0PO/NwcHBExHJZZ8PICI/e73ep7z6zzNPwWP1djhuOp3OfRG5kLROFEXv19fXP49bU6TbYQDa7XZDRF6kUUtEtoFb49YUbh/gOM7YbwqnyG4URQ/PWlQ4ASllNwzDzY2NDX3WwioKmBgeqidgKnioloCp4aE6AmLBQzUExIaH8gtIBA/lFrCTFB7KK2AnDMOrSeGhnAJSg4fyCUgVHsolIHV4KI8AK/BQDgHW4KH4AqzCQwEfiIRheKKUAvjuuu7m2tpakPdMmcYYI1rre0EQ1LPo9w82qyNziMdZ3AAAAABJRU5ErkJggg=="> <img src="https://img.shields.io/badge/AWS-deploys-F29100.svg?logo=amazon">
 
 ### Prerequisites
- ** This demo was conceived and ran on macOS Catalina version 10.15.7. Other operating systems might 
-need slight variations in using command line tools. 
+** This demo was conceived and ran on macOS Catalina version 10.15.7. Other operating systems might
+need slight variations in using command line tools.
 
 - Maven 3.8.5 & Java 17
 - AWS free tier account
@@ -66,18 +66,18 @@ needs to be created with the following policies:
 We will be using the user's credentials and export them as temporary environment variable with the
 `export` (`set` on Windows) command:
 ```
-export AWS_ACCESS_KEY_ID=[your_aws_access_key_id]
-export AWS_SECRET_ACCESS_KEY=[your_aws_secret_access_key_id]
+$ export AWS_ACCESS_KEY_ID=[your_aws_access_key_id]
+$ export AWS_SECRET_ACCESS_KEY=[your_aws_secret_access_key_id]
 ```
 Make sure you have Terraform [installed](https://developer.hashicorp.com/terraform/downloads).
 Under setup/terraform run:
 ```
-terraform init
-terraform plan
+$ terraform init
+$ terraform plan
 ```
 once these 2 commands run successfully and no errors occur, it's time to run:
 ```
-terraform apply --auto-approve
+$ terraform apply --auto-approve
 ```
 
 This should create the needed S3 bucket, the DynamoDB `shipment` table and populate it with some sample data.
@@ -85,19 +85,19 @@ This should create the needed S3 bucket, the DynamoDB `shipment` table and popul
 Now `cd` into `src/main/shipment-list-frontend` and run `npm install` and `npm start`.
 This will spin up the React app that can be accessed on `localhost:3000`.
 
-For running it on Windows, there are some 
+For running it on Windows, there are some
 [extra requirements](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/react-on-windows),
 but no worries, it should be straightforward.
 
 Go back to the root folder and run the backend simply by using
 
 ```
-mvn spring-boot:run -Dspring-boot.run.profiles=prod
+$ mvn spring-boot:run -Dspring-boot.run.profiles=prod
 ```
 Notice the `prod` profile is being set via command line arguments.
 
-At `localhost:3000` you should now be able to see a list of shipments with standard icons, 
-that means that only the database is populated, the pictures still need to be added from the 
+At `localhost:3000` you should now be able to see a list of shipments with standard icons,
+that means that only the database is populated, the pictures still need to be added from the
 `sample-pictures` folder.
 The weight of a shipment we can perceive, but not the size, that's why we need pictures to understand,
 using the "banana for scale" measuring unit. How else would we know??
@@ -106,7 +106,7 @@ using the "banana for scale" measuring unit. How else would we know??
 The Lambda function is still not up. This falls under the `shipment-list-lambda-validator` project.
 
 ```
-git clone https://github.com/tinyg210/shipment-list-lambda-validator.git
+$ git clone https://github.com/tinyg210/shipment-list-lambda-validator.git
 ```
 
 The `create-lambda.sh` script will do everything that needs for the creation and configuration of
@@ -124,19 +124,38 @@ and the shipment picture will be replaced with a generic icon.
 
 ### Developer environment
 
-To switch to using LocalStack instead of AWS services just run `docker compose up` to spin up a
-Localstack
-container.
+
+To switch to using LocalStack instead of AWS services just run `docker compose up` in the root folder
+to spin up a Localstack container.
+
+To generate the exact same resources on LocalStack, we need `tflocal`, a thin wrapper script around
+the terraform command line client. `tflocal` takes care of automatically configuring the local service
+endpoints, which allows you to easily deploy your unmodified Terraform scripts against LocalStack.
+
+You can [install](https://docs.localstack.cloud/user-guide/integrations/terraform/) the `tflocal`
+command via pip (requires a local Python installation):
+```
+$ pip install terraform-local
+```
+Once installed, the `tflocal` command should be available, with the same interface as the terraform
+command line. Try it out:
+```
+$ tflocal --help
+Usage: terraform [global options] <subcommand> [args]
+...
+```
+From here on, it's the same as before:
+```
+$ terraform plan
+$ terraform apply --auto-approve
+```
+
+
 After that, the Spring Boot application needs to start using the dev profile:
 
 ```
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+$ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
-
-This should again populate the DynamoDB, this time on LocalStack.
-From here on, the rest of the steps are the same, but all the scripts that need to run end
-in `-local`,
-as they use the `awslocal` CLI.
 
 The same actions should be easily achieved again, but locally.
 
