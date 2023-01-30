@@ -15,7 +15,7 @@
   <version>0.0.1-SNAPSHOT</version>
 
   <name>shipment-list-demo</name>
-  <description>User Profile Service</description>
+  <description>Shipment List Service</description>
 
   <properties>
     <java.version>17</java.version>
