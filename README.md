@@ -46,12 +46,14 @@ files,
 
 ## Running it
 
-### Production simulation
+## Production simulation
 
 Now we don’t have a real production environment because that’s not the point here, but most likely,
 an application like this runs on a container orchestration platform, and all the necessary configs
 are still provided. Since we’re only simulating a production instance, all the configurations are
 kept in the `application-prod.yml` file.
+
+### User credentials
 
 Before getting started, it's important to note that an IAM user, who's credentials will be used,
 needs to be created with the following policies:
@@ -60,12 +62,19 @@ needs to be created with the following policies:
 - AWSLambda_FullAccess
 - AmazonDynamoDBFullAccess
 
+### Creating the picture bucket
+
 The `scripts/new-bucket.sh` script will create the necessary S3 resource.
+
+### Creating the DynamoDB table
+
 
 At startup @dynamobee helps set up the table we need and populate it with some sample data.
 @dynamobee is library for tracking, managing, and applying database changes
 The changelog acts as a database version control. It tracks all the changes made to the database,
 and helps you manage database migration.
+
+### Running the central backend service
 
 To run the backend simply use
 
@@ -73,8 +82,12 @@ To run the backend simply use
 mvn spring-boot:run -Dspring-boot.run.profiles=prod
 ```
 
+### Running the GUI
+
 Now `cd` into `src/main/shipment-list-frontend` and run `npm install` and `npm start`.
 This will spin up the React app that can be accessed on `localhost:3000`.
+
+### Using the application
 
 You should now be able to see a list of shipments with standard icons, that means that only the
 database
@@ -82,7 +95,13 @@ is populated, the pictures still need to be added from the `sample-pictures` fol
 The weight of a shipment we can perceive, but not the size, that's why we need to display it,
 using the "banana for scale" measuring unit. How else would we know??
 
-The Lambda function is still not up. This falls under the `shipment-list-lambda-validator` project.
+Current available actions using the GUI:
+- upload a new image
+- delete shipment from the list
+
+### Running the Lambda function
+
+The Lambda function is still not there. This falls under the `shipment-list-lambda-validator` project.
 
 ```
 git clone https://github.com/tinyg210/shipment-list-lambda-validator.git
@@ -101,12 +120,12 @@ You should now be able to add a new picture for each shipment. Files that are no
 deleted
 and the shipment picture will be replaced with a generic icon.
 
-### Developer environment
+## Developer environment
 
 To switch to using LocalStack instead of AWS services just run `docker compose up` to spin up a
 Localstack
 container.
-After that, the Spring Boot application needs to start using the dev profile:
+After that, the Spring Boot application needs to start using the dev profile (ideally stop the previous instance):
 
 ```
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
@@ -114,9 +133,10 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 This should again populate the DynamoDB, this time on LocalStack.
 From here on, the rest of the steps are the same, but all the scripts that need to run end
-in `-local`,
+in the `-local` suffix,
 as they use the `awslocal` CLI.
 
 The same actions should be easily achieved again, but locally.
+
 
 
