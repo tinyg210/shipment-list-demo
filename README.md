@@ -138,5 +138,5 @@ as they use the `awslocal` CLI.
 
 The same actions should be easily achieved again, but locally.
 
-
+*Coming soon: creating all resources using Terraform, for a better user experience.
 
