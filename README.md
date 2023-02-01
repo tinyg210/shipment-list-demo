@@ -10,7 +10,7 @@ need slight variations in using command line tools.
 - Maven 3.8.5 & Java 17
 - AWS free tier account
 - Docker - for running LocalStack
-- Terraform for creating AWS & LocalStack resources
+- Terraform (+ Python pip for tflocal) for creating AWS & LocalStack resources
 - npm - for running the frontend app
 
 ## Purpose
