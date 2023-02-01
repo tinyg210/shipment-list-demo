@@ -49,12 +49,14 @@ files, `application-prod.yml`, and  `application-dev.yml`.
 
 ## Running it
 
-### Production simulation
+## Production simulation
 
 Now, we don’t have a real production environment because that’s not the point here, but most likely,
 an application like this runs on a container orchestration platform, and all the necessary configs
 are still provided. Since we’re only simulating a production instance, all the configurations are
 kept in the `application-prod.yml` file.
+
+### User credentials
 
 Before getting started, it's important to note that an IAM user, who's credentials will be used,
 needs to be created with the following policies:
@@ -69,18 +71,31 @@ We will be using the user's credentials and export them as temporary environment
 $ export AWS_ACCESS_KEY_ID=[your_aws_access_key_id]
 $ export AWS_SECRET_ACCESS_KEY=[your_aws_secret_access_key_id]
 ```
-Make sure you have Terraform [installed](https://developer.hashicorp.com/terraform/downloads).
+
+### Building the validator module
+
+Step into the `shipment-picture-lambda-validator` module and run `mvn clean package shade:shade`.
+This will create an uber-jar by packaging all its dependencies. We'll need this one in the next step.
+
+### Creating resources - running Terraform
+
+Make sure you have Terraform [installed](https://developer.hashicorp.com/terraform/downloads).If you're 
+not familiar or uncomfortable with Terraform, there's also a branch that uses only AWS cli to create resources.
+
 Under setup/terraform run:
 ```
 $ terraform init
 $ terraform plan
 ```
-once these 2 commands run successfully and no errors occur, it's time to run:
+Once these 2 commands run successfully and no errors occur, it's time to run:
 ```
-$ terraform apply --auto-approve
+$ terraform apply
 ```
 
-This should create the needed S3 bucket, the DynamoDB `shipment` table and populate it with some sample data.
+This should create the needed S3 bucket, the DynamoDB `shipment` table and populate it with some 
+sample data, and the Lambda function that will help with picture validation.
+
+### Running the GUI
 
 Now `cd` into `src/main/shipment-list-frontend` and run `npm install` and `npm start`.
 This will spin up the React app that can be accessed on `localhost:3000`.
@@ -96,31 +111,22 @@ $ mvn spring-boot:run -Dspring-boot.run.profiles=prod
 ```
 Notice the `prod` profile is being set via command line arguments.
 
+### Using the application
+
 At `localhost:3000` you should now be able to see a list of shipments with standard icons,
 that means that only the database is populated, the pictures still need to be added from the
 `sample-pictures` folder.
+
 The weight of a shipment we can perceive, but not the size, that's why we need pictures to understand,
 using the "banana for scale" measuring unit. How else would we know??
 
+Current available actions using the GUI:
 
-The Lambda function is still not up. This falls under the `shipment-list-lambda-validator` project.
-
-```
-$ git clone https://github.com/tinyg210/shipment-list-lambda-validator.git
-```
-
-The `create-lambda.sh` script will do everything that needs for the creation and configuration of
-the
-Lambda. (I know what you're thinking, Terraform will follow.)
-Run `add-notif-config-for-lambda.sh`, but before that remember to edit `notification-config.json`
-with
-your own AWS account ID. This will enable the Lambda to receive notifications every time a picture
-is being
-added to S3.
-
-You should now be able to add a new picture for each shipment. Files that are not pictures will be
-deleted
-and the shipment picture will be replaced with a generic icon.
+- upload a new image
+- delete shipment from the list
+ 
+Files that are not pictures will be deleted
+and the shipment picture will be replaced with a generic icon, because we don't want any trouble.
 
 ### Developer environment
 
@@ -144,19 +150,28 @@ $ tflocal --help
 Usage: terraform [global options] <subcommand> [args]
 ...
 ```
-From here on, it's the same as before:
+From here on, it's smooth sailing, the same as before. You can eve use the same folder to run 
+your commands:
+
 ```
-$ terraform plan
-$ terraform apply --auto-approve
+$ tflocal init
+$ tflocal plan -var 'env=dev'
+$ tflocal apply -var 'env=dev'
 ```
+Well, almost, we're doing a little cheating and passing and environmental variable to let the Lambda
+know this is the `dev` environment.
 
 
-After that, the Spring Boot application needs to start using the dev profile:
+After that, the Spring Boot application needs to start using the dev profile (make sure you're in the 
+root folder):
 
 ```
 $ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-The same actions should be easily achieved again, but locally.
+Go back to `localhost:3000` and a new list will be available, and notice that the functionalities of
+the application have not changed. 
+
+There you have it, smooth transition from AWS to Localstack, with no code change. 👍🏻
 
 

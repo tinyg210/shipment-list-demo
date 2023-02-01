@@ -61,3 +61,7 @@ src/main/shipment-list-frontend/yarn-error.log*
 setup/terraform/terraform.tfstate
 setup/terraform/.terraform.lock.hcl
 setup/terraform/terraform.tfstate.backup
+
+# lambda module
+shipment-picture-lambda-validator/target
+shipment-picture-lambda-validator/.idea
