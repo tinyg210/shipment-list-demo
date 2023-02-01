@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum BucketName {
 
-  SHIPMENT_PICTURE("shipment-list-demo-bucket");
+  SHIPMENT_PICTURE("shipment-picture-bucket");
 
   private final String bucketName;
 

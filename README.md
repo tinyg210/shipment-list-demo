@@ -4,10 +4,13 @@
 
 ### Prerequisites
 
+** This demo was conceived and ran on macOS Catalina version 10.15.7. Other operating systems might
+need slight variations in using command line tools.
+
 - Maven 3.8.5 & Java 17
 - AWS free tier account
 - Docker - for running LocalStack
-- AWS Command Line Interface - for managing your services
+- Terraform for creating AWS & LocalStack resources
 - npm - for running the frontend app
 
 ## Purpose
@@ -37,18 +40,20 @@ The AWS services involved are:
 ## How we will be using it
 
 We’ll be walking through a few scenarios using the application, and we expect it to maintain the
-behavior in both production and development environments.
+behavior in both production and development environments. This behaviour can be "scientifically"
+backed up
+by adding integration tests.
+
 We’ll take advantage of one of the core features of the Spring framework that allows us to bind our
 beans to different profiles, such as dev, test, and prod. Of course, these beans need to know how to
 behave in each environment, so they’ll get that information from their designated configuration
-files,
-`application-prod.yml`, and  `application-dev.yml`.
+files, `application-prod.yml`, and  `application-dev.yml`.
 
 ## Running it
 
 ## Production simulation
 
-Now we don’t have a real production environment because that’s not the point here, but most likely,
+Now, we don’t have a real production environment because that’s not the point here, but most likely,
 an application like this runs on a container orchestration platform, and all the necessary configs
 are still provided. Since we’re only simulating a production instance, all the configurations are
 kept in the `application-prod.yml` file.
@@ -62,81 +67,139 @@ needs to be created with the following policies:
 - AWSLambda_FullAccess
 - AmazonDynamoDBFullAccess
 
-### Creating the picture bucket
-
-The `scripts/new-bucket.sh` script will create the necessary S3 resource.
-
-### Creating the DynamoDB table
-
-
-At startup @dynamobee helps set up the table we need and populate it with some sample data.
-@dynamobee is library for tracking, managing, and applying database changes
-The changelog acts as a database version control. It tracks all the changes made to the database,
-and helps you manage database migration.
-
-### Running the central backend service
-
-To run the backend simply use
+We will be using the user's credentials and export them as temporary environment variable with the
+`export` (`set` on Windows) command:
 
 ```
-mvn spring-boot:run -Dspring-boot.run.profiles=prod
+$ export AWS_ACCESS_KEY_ID=[your_aws_access_key_id]
+$ export AWS_SECRET_ACCESS_KEY=[your_aws_secret_access_key_id]
 ```
+
+### Building the validator module
+
+Step into the `shipment-picture-lambda-validator` module and run `mvn clean package shade:shade`.
+This will create an uber-jar by packaging all its dependencies. We'll need this one in the next
+step.
+
+### Creating resources - running Terraform
+
+Make sure you have Terraform [installed](https://developer.hashicorp.com/terraform/downloads).If
+you're
+not familiar or uncomfortable with Terraform, there's also a branch that uses only AWS cli to create
+resources.
+
+Under setup/terraform run:
+
+```
+$ terraform init
+$ terraform plan
+```
+
+Once these 2 commands run successfully and no errors occur, it's time to run:
+
+```
+$ terraform apply
+```
+
+This should create the needed S3 bucket, the DynamoDB `shipment` table and populate it with some
+sample data, and the Lambda function that will help with picture validation.
+
+### Running the GUI
 
 ### Running the GUI
 
 Now `cd` into `src/main/shipment-list-frontend` and run `npm install` and `npm start`.
 This will spin up the React app that can be accessed on `localhost:3000`.
 
+For running it on Windows, there are some
+[extra requirements](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/react-on-windows)
+,
+but no worries, it should be straightforward.
+
+Go back to the root folder and run the backend simply by using
+
+```
+$ mvn spring-boot:run -Dspring-boot.run.profiles=prod
+```
+
+Notice the `prod` profile is being set via command line arguments.
+
 ### Using the application
 
-You should now be able to see a list of shipments with standard icons, that means that only the
-database
-is populated, the pictures still need to be added from the `sample-pictures` folder.
-The weight of a shipment we can perceive, but not the size, that's why we need to display it,
+At `localhost:3000` you should now be able to see a list of shipments with standard icons,
+that means that only the database is populated, the pictures still need to be added from the
+`sample-pictures` folder.
+
+The weight of a shipment we can perceive, but not the size, that's why we need pictures to
+understand,
 using the "banana for scale" measuring unit. How else would we know??
 
 Current available actions using the GUI:
+
 - upload a new image
 - delete shipment from the list
 
-### Running the Lambda function
-
-The Lambda function is still not there. This falls under the `shipment-list-lambda-validator` project.
-
-```
-git clone https://github.com/tinyg210/shipment-list-lambda-validator.git
-```
-
-The `create-lambda.sh` script will do everything that needs for the creation and configuration of
-the
-Lambda. (I know what you're thinking, Terraform will follow.)
-Run `add-notif-config-for-lambda.sh`, but before that remember to edit `notification-config.json`
-with
-your own AWS account ID. This will enable the Lambda to receive notifications every time a picture
-is being
-added to S3.
-
-You should now be able to add a new picture for each shipment. Files that are not pictures will be
-deleted
-and the shipment picture will be replaced with a generic icon.
+Files that are not pictures will be deleted
+and the shipment picture will be replaced with a generic icon, because we don't want any trouble.
 
 ## Developer environment
 
+<<<<<<< HEAD
 To switch to using LocalStack instead of AWS services just run `docker compose up` to spin up a
 Localstack
 container.
-After that, the Spring Boot application needs to start using the dev profile (ideally stop the previous instance):
+After that, the Spring Boot application needs to start using the dev profile (ideally stop the
+previous instance):
+=======
+
+To switch to using LocalStack instead of AWS services just run `docker compose up` in the root
+folder
+to spin up a Localstack container.
+
+To generate the exact same resources on LocalStack, we need `tflocal`, a thin wrapper script around
+the terraform command line client. `tflocal` takes care of automatically configuring the local
+service
+endpoints, which allows you to easily deploy your unmodified Terraform scripts against LocalStack.
+
+You can [install](https://docs.localstack.cloud/user-guide/integrations/terraform/) the `tflocal`
+command via pip (requires a local Python installation):
 
 ```
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+$ pip install terraform-local
 ```
 
-This should again populate the DynamoDB, this time on LocalStack.
-From here on, the rest of the steps are the same, but all the scripts that need to run end
-in the `-local` suffix,
-as they use the `awslocal` CLI.
+Once installed, the `tflocal` command should be available, with the same interface as the terraform
+command line. Try it out:
 
-The same actions should be easily achieved again, but locally.
+```
+$ tflocal --help
+Usage: terraform [global options] <subcommand> [args]
+...
+```
 
-*Coming soon: creating all resources using Terraform, for a better user experience.
+From here on, it's smooth sailing, the same as before. You can eve use the same folder to run
+your commands:
+
+```
+$ tflocal init
+$ tflocal plan -var 'env=dev'
+$ tflocal apply -var 'env=dev'
+```
+
+Well, almost, we're doing a little cheating and passing and environmental variable to let the Lambda
+know this is the `dev` environment.
+
+After that, the Spring Boot application needs to start using the dev profile (make sure you're in
+the
+root folder):
+
+```
+$ mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+Go back to `localhost:3000` and a new list will be available, and notice that the functionalities of
+the application have not changed.
+
+There you have it, smooth transition from AWS to Localstack, with no code change. 👍🏻
+
 

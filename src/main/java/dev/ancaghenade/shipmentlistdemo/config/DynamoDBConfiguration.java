@@ -8,7 +8,6 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.github.dynamobee.Dynamobee;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,15 +49,6 @@ public class DynamoDBConfiguration {
         )
         .withCredentials(amazonAWSCredentialsProvider())
         .build();
-  }
-
-  @Bean
-  public Dynamobee dynamobee(AmazonDynamoDB dynamoDB) {
-    Dynamobee runner = new Dynamobee(dynamoDB);
-    runner.setChangeLogsScanPackage(
-        "dev.ancaghenade.shipmentlistdemo.changelogs"); // the package to be scanned for changesets
-
-    return runner;
   }
 
   public AWSCredentialsProvider amazonAWSCredentialsProvider() {
