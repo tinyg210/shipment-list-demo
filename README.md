@@ -144,13 +144,6 @@ and the shipment picture will be replaced with a generic icon, because we don't 
 
 ## Developer environment
 
-<<<<<<< HEAD
-To switch to using LocalStack instead of AWS services just run `docker compose up` to spin up a
-Localstack
-container.
-After that, the Spring Boot application needs to start using the dev profile (ideally stop the
-previous instance):
-=======
 
 To switch to using LocalStack instead of AWS services just run `docker compose up` in the root
 folder
