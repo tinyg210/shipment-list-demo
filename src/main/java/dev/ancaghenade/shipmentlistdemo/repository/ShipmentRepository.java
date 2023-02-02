@@ -23,6 +23,9 @@ public class ShipmentRepository {
   }
 
   public Shipment upsert(Shipment shipment) {
+    if (Objects.isNull(shipment.getShipmentId())) {
+      dynamoDBMapper.save(shipment);
+    }
     Shipment shp = dynamoDBMapper.load(Shipment.class, shipment.getShipmentId());
     if (Objects.isNull(shp)) {
       dynamoDBMapper.save(shipment);

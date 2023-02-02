@@ -138,6 +138,7 @@ Current available actions using the GUI:
 
 - upload a new image
 - delete shipment from the list
+- create and update shipment are available only via Postman (or any other API platform)
 
 Files that are not pictures will be deleted
 and the shipment picture will be replaced with a generic icon, because we don't want any trouble.

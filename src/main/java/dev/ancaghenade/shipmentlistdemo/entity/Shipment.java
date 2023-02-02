@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.NonNull;
 
 @Data
 @Getter
@@ -28,9 +29,11 @@ public class Shipment {
   private String shipmentId;
 
   @DynamoDBAttribute
+  @NonNull
   private Participant recipient;
 
   @DynamoDBAttribute
+  @NonNull
   private Participant sender;
 
   @DynamoDBAttribute
