@@ -1,0 +1,254 @@
+{
+  "shipment1": {
+    "shipmentId": {
+      "S": "dc3b6668-45ba-4c10-9860-95bbffaebfc1"
+    },
+    "recipient": {
+      "M": {
+        "name": {
+          "S": "Harry Potter"
+        },
+        "address": {
+          "M": {
+            "postalCode": {
+              "S": "LNDNGB"
+            },
+            "street": {
+              "S": "Privet Drive"
+            },
+            "number": {
+              "S": "4"
+            },
+            "city": {
+              "S": "Little Whinging"
+            },
+            "additionalInfo": {
+              "S": ""
+            }
+          }
+        }
+      }
+    },
+    "sender": {
+      "M": {
+        "name": {
+          "S": "Hermione Granger"
+        },
+        "address": {
+          "M": {
+            "postalCode": {
+              "S": "OXFGB"
+            },
+            "street": {
+              "S": "Grimmauld Place"
+            },
+            "number": {
+              "S": "12"
+            },
+            "city": {
+              "S": "London"
+            },
+            "additionalInfo": {
+              "S": ""
+            }
+          }
+        }
+      }
+    },
+    "weight": {
+      "N": "1.0"
+    },
+    "imageLink": {
+      "NULL": true
+    }
+  },
+  "shipment2": {
+    "shipmentId": {
+      "S": "f7fc2d00-5cd9-4749-b5ac-10a6f7ac0310"
+    },
+    "recipient": {
+      "M": {
+        "name": {
+          "S": "Walter White"
+        },
+        "address": {
+          "M": {
+            "postalCode": {
+              "S": "ALBQNM"
+            },
+            "street": {
+              "S": "Negra Arroyo Lane"
+            },
+            "number": {
+              "S": "308"
+            },
+            "city": {
+              "S": "Albuquerque"
+            },
+            "additionalInfo": {
+              "S": "RV storage"
+            }
+          }
+        }
+      }
+    },
+    "sender": {
+      "M": {
+        "name": {
+          "S": "Tony Stark"
+        },
+        "address": {
+          "M": {
+            "postalCode": {
+              "S": "NYCNY"
+            },
+            "street": {
+              "S": "Avenue of the Americas"
+            },
+            "number": {
+              "S": "64"
+            },
+            "city": {
+              "S": "New York City"
+            },
+            "additionalInfo": {
+              "S": "Stark Tower"
+            }
+          }
+        }
+      }
+    },
+    "weight": {
+      "N": "0.7"
+    },
+    "imageLink": {
+      "NULL": true
+    }
+  },
+  "shipment3": {
+    "shipmentId": {
+      "S": "3317ac4f-1f9b-4bab-a974-4aadf79d7da5"
+    },
+    "recipient": {
+      "M": {
+        "name": {
+          "S": "Buddy The Elf"
+        },
+        "address": {
+          "M": {
+            "postalCode": {
+              "S": "938746"
+            },
+            "street": {
+              "S": "Candy Cane Lane"
+            },
+            "number": {
+              "S": "1"
+            },
+            "city": {
+              "S": "North Pole"
+            },
+            "additionalInfo": {
+              "S": "Santa's Workshop"
+            }
+          }
+        }
+      }
+    },
+    "sender": {
+      "M": {
+        "name": {
+          "S": "The Grinch"
+        },
+        "address": {
+          "M": {
+            "postalCode": {
+              "S": "69869"
+            },
+            "street": {
+              "S": "Mount Crumpit"
+            },
+            "number": {
+              "S": "666"
+            },
+            "city": {
+              "S": "Whoville"
+            },
+            "additionalInfo": {
+              "S": "Cave"
+            }
+          }
+        }
+      }
+    },
+    "weight": {
+      "N": "9.0"
+    },
+    "imageLink": {
+      "NULL": true
+    }
+  },
+  "shipment4": {
+    "shipmentId": {
+      "S": "26c09286-a00c-11ed-a8fc-0242ac120002"
+    },
+    "recipient": {
+      "M": {
+        "name": {
+          "S": "Home Sweet Home"
+        },
+        "address": {
+          "M": {
+            "postalCode": {
+              "S": "98653"
+            },
+            "street": {
+              "S": "47th Street"
+            },
+            "number": {
+              "S": "4"
+            },
+            "city": {
+              "S": "Springfield"
+            },
+            "additionalInfo": {
+              "S": ""
+            }
+          }
+        }
+      }
+    },
+    "sender": {
+      "M": {
+        "name": {
+          "S": "Warehouse of Unicorns"
+        },
+        "address": {
+          "M": {
+            "postalCode": {
+              "S": "98653"
+            },
+            "street": {
+              "S": "47th Street"
+            },
+            "number": {
+              "S": "4"
+            },
+            "city": {
+              "S": "Townsville"
+            },
+            "additionalInfo": {
+              "S": ""
+            }
+          }
+        }
+      }
+    },
+    "weight": {
+      "N": "2.3"
+    },
+    "imageLink": {
+      "NULL": true
+    }
+  }
+}

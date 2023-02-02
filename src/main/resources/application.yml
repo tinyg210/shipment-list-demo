@@ -8,6 +8,13 @@ logging:
   level:
     root=debug:
 
-spring:
-  profiles:
-    default: prod
+# override by profile configs
+aws:
+  credentials:
+    access-key:
+    secret-key:
+  s3:
+    endpoint: dummy-s3
+  dynamodb:
+    endpoint: dummy-dynamodb
+  region: region

@@ -171,8 +171,9 @@ Usage: terraform [global options] <subcommand> [args]
 ...
 ```
 
-From here on, it's smooth sailing, the same as before. You can eve use the same folder to run
-your commands:
+From here on, it's smooth sailing, the same as before. Switch to `setup/tflocal` folder, the files are 
+identical as the ones in `setup/terraform`, but for the newly generated state files, it is a good idea
+to separate these "workspaces":
 
 ```
 $ tflocal init
@@ -180,7 +181,7 @@ $ tflocal plan -var 'env=dev'
 $ tflocal apply -var 'env=dev'
 ```
 
-Well, almost, we're doing a little cheating and passing and environmental variable to let the Lambda
+What we're doing here is just passing an environmental variable to let the Lambda
 know this is the `dev` environment.
 
 After that, the Spring Boot application needs to start using the dev profile (make sure you're in
