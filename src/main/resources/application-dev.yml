@@ -6,5 +6,5 @@ aws:
   s3:
     endpoint: https://s3.localhost.localstack.cloud:4566/
   dynamodb:
-    endpoint: https://dynamodb.localhost.localstack.cloud:4566/
+    endpoint: https://localhost.localstack.cloud:4566/
   region: eu-central-1

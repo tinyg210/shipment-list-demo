@@ -67,7 +67,7 @@ needs to be created with the following policies:
 - AWSLambda_FullAccess
 - AmazonDynamoDBFullAccess
 
-We will be using the user's credentials and export them as temporary environment variable with the
+We will be using the user's credentials and export them as temporary environment variables with the
 `export` (`set` on Windows) command:
 
 ```
@@ -172,7 +172,7 @@ Usage: terraform [global options] <subcommand> [args]
 ```
 
 From here on, it's smooth sailing, the same as before. Switch to `setup/tflocal` folder, the files are 
-identical as the ones in `setup/terraform`, but for the newly generated state files, it is a good idea
+identical to the ones in `setup/terraform`, but for the newly generated state files, it is a good idea
 to separate these "workspaces":
 
 ```
@@ -192,7 +192,7 @@ root folder):
 $ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-Go back to `localhost:3000` and a new list will be available, and notice that the functionalities of
+Go back to `localhost:3000` and a new list will be available; notice that the functionalities of
 the application have not changed.
 
 There you have it, smooth transition from AWS to Localstack, with no code change. 👍🏻

@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ShipmentRepository {
+public class DynamoDBService {
 
   private final DynamoDBMapper dynamoDBMapper;
 
   @Autowired
-  public ShipmentRepository(DynamoDBMapper dynamoDBMapper) {
+  public DynamoDBService(DynamoDBMapper dynamoDBMapper) {
     this.dynamoDBMapper = dynamoDBMapper;
   }
 

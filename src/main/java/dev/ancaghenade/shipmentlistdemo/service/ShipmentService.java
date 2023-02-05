@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.model.AmazonS3Exception;
 import dev.ancaghenade.shipmentlistdemo.buckets.BucketName;
 import dev.ancaghenade.shipmentlistdemo.entity.Shipment;
 import dev.ancaghenade.shipmentlistdemo.repository.S3StorageService;
-import dev.ancaghenade.shipmentlistdemo.repository.ShipmentRepository;
+import dev.ancaghenade.shipmentlistdemo.repository.DynamoDBService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,26 +23,26 @@ import org.springframework.web.multipart.MultipartFile;
 public class ShipmentService {
 
 
-  private final ShipmentRepository shipmentRepository;
+  private final DynamoDBService dynamoDBService;
   private final S3StorageService s3StorageService;
 
 
   @Autowired
-  public ShipmentService(ShipmentRepository shipmentRepository, S3StorageService s3StorageService) {
-    this.shipmentRepository = shipmentRepository;
+  public ShipmentService(DynamoDBService dynamoDBService, S3StorageService s3StorageService) {
+    this.dynamoDBService = dynamoDBService;
     this.s3StorageService = s3StorageService;
   }
 
   public List<Shipment> getAllShipments() {
-    return shipmentRepository.getAllShipments();
+    return dynamoDBService.getAllShipments();
   }
 
   public String deleteShipment(String shipmentId) {
-   return shipmentRepository.delete(shipmentId);
+   return dynamoDBService.delete(shipmentId);
   }
 
   public Shipment saveShipment(Shipment shipment) {
-    return shipmentRepository.upsert(shipment);
+    return dynamoDBService.upsert(shipment);
   }
 
   public void uploadShipmentImage(String shipmentId, MultipartFile file) {
@@ -63,12 +63,12 @@ public class ShipmentService {
       throw new IllegalStateException(e);
     }
     shipment.setImageLink(fileName);
-    shipmentRepository.upsert(shipment);
+    dynamoDBService.upsert(shipment);
   }
 
 
   public byte[] downloadShipmentImage(String shipmentId) {
-    Shipment shipment = shipmentRepository.getShipment(shipmentId).stream()
+    Shipment shipment = dynamoDBService.getShipment(shipmentId).stream()
         .findFirst()
         .orElseThrow(
             () -> new IllegalStateException(format("Shipment %s was not found.", shipmentId)));
@@ -93,7 +93,7 @@ public class ShipmentService {
   }
 
   private Shipment getShipment(String shipmentId) {
-    return shipmentRepository.getShipment(shipmentId).stream()
+    return dynamoDBService.getShipment(shipmentId).stream()
         .findFirst()
         .orElseThrow(
             () -> new IllegalStateException(format("Shipment %s was not found.", shipmentId)));
