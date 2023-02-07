@@ -64,9 +64,9 @@ resource "aws_s3_bucket_acl" "lambda_code_bucket_acl" {
 }
 
 resource "aws_s3_bucket_object" "lambda_code" {
-  source = "../../shipment-picture-lambda-validator/target/shipment-picture-lambda-validator-1.0-SNAPSHOT.jar"
+  source = "../../shipment-picture-lambda-validator/target/shipment-picture-lambda-validator.jar"
   bucket = aws_s3_bucket.lambda_code_bucket.id
-  key    = "shipment-picture-lambda-validator-1.0-SNAPSHOT.jar"
+  key    = "shipment-picture-lambda-validator.jar"
 }
 
 resource "aws_lambda_function" "shipment_picture_lambda_validator" {
