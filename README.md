@@ -36,9 +36,9 @@ The demo consists of a backend and a frontend implementation, using React to dis
 information.
 The AWS services involved are:
 
-- S3 for storing pictures
-- DynamoDB for the entities
-- Lambda function that will validate the pictures.
+- [S3](https://docs.localstack.cloud/user-guide/aws/s3/) for storing pictures
+- [DynamoDB](https://docs.localstack.cloud/user-guide/aws/dynamodb/) for the entities
+- [Lambda](https://docs.localstack.cloud/user-guide/aws/lambda/) function that will validate the pictures.
 
 
 #### How we will be using it
