@@ -4,9 +4,6 @@
 
 ### Prerequisites
 
-** This demo was conceived and ran on macOS Catalina version 10.15.7. Other operating systems might
-need slight variations in using command line tools.
-
 - Maven 3.8.5 & Java 17
 - AWS free tier account
 - Docker - for running LocalStack
