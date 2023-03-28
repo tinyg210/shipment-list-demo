@@ -21,11 +21,12 @@ Of course this comes with other advantages, but the first focus point is making 
 
 ## Prerequisites
 
-- Maven 3.8.5 & Java 17
-- AWS free tier account
-- Docker - for running LocalStack
-- Terraform (+ Python pip for tflocal) for creating AWS & LocalStack resources
-- npm - for running the frontend app
+- [Maven 3.8.5](https://maven.apache.org/install.html) & [Java 17](https://www.java.com/en/download/help/download_options.html)
+- [AWS free tier account](https://aws.amazon.com/free/)
+- [LocalStack](https://localstack.cloud/)
+- [Docker](https://docs.docker.com/get-docker/) - for running LocalStack
+- [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) (+ Python pip for [tflocal](https://pypi.org/project/terraform-local/)) for creating AWS & LocalStack resources
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) - for running the frontend app
 
 #### What it does
 
@@ -145,7 +146,7 @@ Current available actions using the GUI:
 Files that are not pictures will be deleted
 and the shipment picture will be replaced with a generic icon, because we don't want any trouble.
 
-## Developer environment (Running on LocalStack
+## Developer environment (Running on LocalStack)
 
 
 To switch to using LocalStack instead of AWS services just run `docker compose up` in the root
