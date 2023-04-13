@@ -1,57 +1,39 @@
 package dev.ancaghenade.shipmentlistdemo.config;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import dev.ancaghenade.shipmentlistdemo.entity.Shipment;
+import java.net.URI;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 @Configuration
-public class DynamoDBConfiguration {
-
-  @Value("${aws.credentials.access-key}")
-  private String awsAccessKey;
-
-  @Value("${aws.credentials.secret-key}")
-  private String awsSecretKey;
+public class DynamoDBConfiguration extends AWSClientConfig {
 
   @Value("${aws.dynamodb.endpoint}")
   private String awsDynamoDBEndPoint;
 
-  @Value("${aws.region}")
-  private String awsRegion;
-
   @Bean
-  public DynamoDBMapper dynamoDBMapper() {
-    return new DynamoDBMapper(buildAmazonDynamoDB());
-  }
+  public DynamoDbEnhancedClient dynamoDbClient() {
+    DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
+        .region(Region.of(awsRegion))
+        .credentialsProvider(amazonAWSCredentialsProvider())
+        .endpointOverride(URI.create(awsDynamoDBEndPoint))
+        .build();
 
-  @Bean
-  public AWSCredentials amazonAWSCredentials() {
-    return new BasicAWSCredentials(awsAccessKey, awsSecretKey);
-  }
-
-  @Bean
-  AmazonDynamoDB buildAmazonDynamoDB() {
-    return AmazonDynamoDBClientBuilder
-        .standard()
-        .withEndpointConfiguration(
-            new EndpointConfiguration(
-                awsDynamoDBEndPoint,
-                awsRegion
-            )
-        )
-        .withCredentials(amazonAWSCredentialsProvider())
+    // using the enhanced client for mapping classes to tables
+    return DynamoDbEnhancedClient.builder()
+        .dynamoDbClient(dynamoDbClient)
         .build();
   }
-
-  public AWSCredentialsProvider amazonAWSCredentialsProvider() {
-    return new AWSStaticCredentialsProvider(amazonAWSCredentials());
+  @Bean
+  public DynamoDbTable shipmentTable(DynamoDbEnhancedClient dynamoDbClient) {
+    return dynamoDbClient.table("shipment", TableSchema.fromBean(Shipment.class));
   }
+
+
 }

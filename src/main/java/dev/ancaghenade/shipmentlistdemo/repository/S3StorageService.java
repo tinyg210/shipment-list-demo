@@ -1,49 +1,48 @@
 package dev.ancaghenade.shipmentlistdemo.repository;
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.util.IOUtils;
+import dev.ancaghenade.shipmentlistdemo.buckets.BucketName;
+import dev.ancaghenade.shipmentlistdemo.util.FileUtil;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Service
 public class S3StorageService {
 
-  private final AmazonS3 s3;
+  private final S3Client s3;
 
   @Autowired
-  public S3StorageService(AmazonS3 s3) {
+  public S3StorageService(S3Client s3) {
     this.s3 = s3;
   }
 
   public void save(String path, String fileName,
-      InputStream file, Optional<Map<String, String>> optionalMetadata) {
-    ObjectMetadata fileMetadata = new ObjectMetadata();
-    optionalMetadata.ifPresent(map -> {
-      if (!map.isEmpty()) {
-        map.forEach(fileMetadata::addUserMetadata);
-      }
-    });
-    try {
-      s3.putObject(path, fileName, file, fileMetadata);
-    } catch (AmazonServiceException e) {
-      throw new IllegalStateException("Could not save file to S3.", e);
-    }
+      MultipartFile multipartFile)
+      throws IOException {
+    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        .bucket(BucketName.SHIPMENT_PICTURE.getBucketName())
+        .key(path + "/" + fileName)
+        .build();
+
+    s3.putObject(putObjectRequest,
+        RequestBody.fromFile(FileUtil.convertMultipartFileToFile(multipartFile)));
 
   }
 
-  public byte[] download(String path, String key) {
-    try {
-      return IOUtils.toByteArray(s3.getObject(path, key).getObjectContent());
-    } catch (AmazonServiceException e) {
-      throw new IllegalStateException("Failed to download file.", e);
-    } catch (IOException e) {
-      return new byte[0];
-    }
+  public byte[] download(String path, String key) throws IOException {
+    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        .bucket(BucketName.SHIPMENT_PICTURE.getBucketName())
+        .key(path + "/" + key)
+        .build();
+
+    return s3.getObject(getObjectRequest).readAllBytes();
+
   }
 }

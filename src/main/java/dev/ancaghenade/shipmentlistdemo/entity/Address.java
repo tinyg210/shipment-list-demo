@@ -1,35 +1,72 @@
 package dev.ancaghenade.shipmentlistdemo.entity;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
 @Builder
-@DynamoDBDocument
+@DynamoDbBean
 public class Address {
 
-  @DynamoDBAttribute
   private String postalCode;
-
-  @DynamoDBAttribute
   private String street;
-
-  @DynamoDBAttribute
   private String number;
-
-  @DynamoDBAttribute
   private String city;
-
-  @DynamoDBAttribute
   private String additionalInfo;
+
+  @DynamoDbAttribute("postalCode")
+  public String getPostalCode() {
+    return postalCode;
+  }
+
+  public void setPostalCode(String postalCode) {
+    this.postalCode = postalCode;
+  }
+
+  @DynamoDbAttribute("street")
+
+  public String getStreet() {
+    return street;
+  }
+
+  public void setStreet(String street) {
+    this.street = street;
+  }
+
+  @DynamoDbAttribute("number")
+
+  public String getNumber() {
+    return number;
+  }
+
+
+  public void setNumber(String number) {
+    this.number = number;
+  }
+
+  @DynamoDbAttribute("city")
+
+  public String getCity() {
+    return city;
+  }
+
+  public void setCity(String city) {
+    this.city = city;
+  }
+
+  @DynamoDbAttribute("additionalInfo")
+
+  public String getAdditionalInfo() {
+    return additionalInfo;
+  }
+
+  public void setAdditionalInfo(String additionalInfo) {
+    this.additionalInfo = additionalInfo;
+  }
 }

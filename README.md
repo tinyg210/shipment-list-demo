@@ -1,3 +1,4 @@
+
 # Shipment List Demo Application - AWS in PROD and LocalStack on DEV environment
 
 
@@ -180,7 +181,7 @@ to separate these "workspaces":
 
 ```
 $ tflocal init
-$ tflocal plan -var 'env=dev'
+$ tflocal plan -var 'env=dev
 $ tflocal apply -var 'env=dev'
 ```
 

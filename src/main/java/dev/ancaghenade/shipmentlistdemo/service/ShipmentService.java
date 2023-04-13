@@ -2,11 +2,10 @@ package dev.ancaghenade.shipmentlistdemo.service;
 
 import static java.lang.String.format;
 
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 import dev.ancaghenade.shipmentlistdemo.buckets.BucketName;
 import dev.ancaghenade.shipmentlistdemo.entity.Shipment;
-import dev.ancaghenade.shipmentlistdemo.repository.S3StorageService;
 import dev.ancaghenade.shipmentlistdemo.repository.DynamoDBService;
+import dev.ancaghenade.shipmentlistdemo.repository.S3StorageService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +37,7 @@ public class ShipmentService {
   }
 
   public String deleteShipment(String shipmentId) {
-   return dynamoDBService.delete(shipmentId);
+    return dynamoDBService.delete(shipmentId);
   }
 
   public Shipment saveShipment(Shipment shipment) {
@@ -58,8 +57,8 @@ public class ShipmentService {
 
     String fileName = format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
     try {
-      s3StorageService.save(path, fileName, file.getInputStream(), Optional.of(metadata));
-    } catch (IOException | AmazonS3Exception e) {
+      s3StorageService.save(path, fileName, file);
+    } catch (IOException e) {
       throw new IllegalStateException(e);
     }
     shipment.setImageLink(fileName);
@@ -77,7 +76,13 @@ public class ShipmentService {
         shipment.getShipmentId());
     try {
       return Optional.ofNullable(shipment.getImageLink())
-          .map(link -> s3StorageService.download(path, link))
+          .map(link -> {
+            try {
+              return s3StorageService.download(path, link);
+            } catch (IOException e) {
+              throw new RuntimeException(e);
+            }
+          })
           .orElse(Files.readAllBytes(new File("src/main/resources/placeholder.jpg").toPath()));
     } catch (IOException e) {
       throw new RuntimeException(e);
