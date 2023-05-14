@@ -1,4 +1,5 @@
 aws:
+  account: ${AWS_ACCOUNT}
   credentials:
     access-key: ${AWS_ACCESS_KEY_ID}
     secret-key: ${AWS_SECRET_ACCESS_KEY}
@@ -6,4 +7,7 @@ aws:
     endpoint: https://dynamodb.eu-central-1.amazonaws.com
   s3:
     endpoint: https://s3.eu-central-1.amazonaws.com
+  sns:
+    endpoint: https://sns.eu-central-1.amazonaws.com
+    subscriberEndpoint: ${FORWARDING}
   region: eu-central-1

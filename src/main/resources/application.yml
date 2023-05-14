@@ -8,7 +8,6 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
-
 logging:
   level:
     root=debug:
@@ -22,4 +21,7 @@ aws:
     endpoint: dummy-s3
   dynamodb:
     endpoint: dummy-dynamodb
+  sns:
+    endpoint: dummy-sns
+    topic: update_shipment_picture_topic
   region: region

@@ -1,7 +1,6 @@
 package dev.ancaghenade.shipmentlistdemo.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -17,7 +16,6 @@ public abstract class AWSClientConfig {
   @Value("${aws.region}")
   protected String awsRegion;
 
-  @Bean
   protected AwsCredentialsProvider amazonAWSCredentialsProvider() {
     return StaticCredentialsProvider.create(AwsBasicCredentials.create(awsAccessKey, awsSecretKey));
   }

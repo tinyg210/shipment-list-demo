@@ -2,16 +2,16 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.52.0"
+      version = ">= 4.64.0"
     }
   }
 }
 provider "aws" {
-  region = "eu-central-1"
+  region = "eu-east-1"
 }
 
 resource "aws_s3_bucket" "shipment_picture_bucket" {
-  bucket = "shipment-picture-bucket"
+  bucket        = "shipment-picture-bucket"
   force_destroy = true
   lifecycle {
     prevent_destroy = false
@@ -51,7 +51,7 @@ resource "aws_dynamodb_table_item" "shipment" {
 
 
 resource "aws_s3_bucket" "lambda_code_bucket" {
-  bucket = "shipment-picture-lambda-validator-bucket"
+  bucket        = "shipment-picture-lambda-validator-bucket"
   force_destroy = true
   lifecycle {
     prevent_destroy = false
@@ -60,7 +60,7 @@ resource "aws_s3_bucket" "lambda_code_bucket" {
 
 resource "aws_s3_bucket_acl" "lambda_code_bucket_acl" {
   bucket = aws_s3_bucket.lambda_code_bucket.id
-  acl = "private"
+  acl    = "private"
 }
 
 resource "aws_s3_bucket_object" "lambda_code" {
@@ -81,6 +81,7 @@ resource "aws_lambda_function" "shipment_picture_lambda_validator" {
   environment {
     variables = {
       ENVIRONMENT = var.env
+      SNS_TOPIC_ARN = aws_sns_topic.update_shipment_picture_topic.arn
     }
   }
 }
@@ -99,6 +100,20 @@ resource "aws_lambda_permission" "s3_lambda_exec_permission" {
   function_name = aws_lambda_function.shipment_picture_lambda_validator.function_name
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.shipment_picture_bucket.arn
+}
+
+resource "aws_sns_topic" "update_shipment_picture_topic" {
+  name = "update_shipment_picture_topic"
+}
+
+resource "aws_sqs_queue" "update_shipment_picture_topic_queue" {
+  name = "update_shipment_picture_topic_queue"
+}
+
+resource "aws_sns_topic_subscription" "example_subscription" {
+  topic_arn = aws_sns_topic.update_shipment_picture_topic.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.update_shipment_picture_topic_queue.arn
 }
 
 resource "aws_iam_role" "lambda_exec" {

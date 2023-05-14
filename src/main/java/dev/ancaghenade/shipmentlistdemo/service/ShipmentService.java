@@ -2,16 +2,13 @@ package dev.ancaghenade.shipmentlistdemo.service;
 
 import static java.lang.String.format;
 
-import dev.ancaghenade.shipmentlistdemo.buckets.BucketName;
 import dev.ancaghenade.shipmentlistdemo.entity.Shipment;
 import dev.ancaghenade.shipmentlistdemo.repository.DynamoDBService;
 import dev.ancaghenade.shipmentlistdemo.repository.S3StorageService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,12 +47,9 @@ public class ShipmentService {
 
     Shipment shipment = getShipment(shipmentId);
 
-    Map<String, String> metadata = getMetadata(file);
+    String path = shipment.getShipmentId();
 
-    String path = format("%s/%s", BucketName.SHIPMENT_PICTURE.getBucketName(),
-        shipment.getShipmentId());
-
-    String fileName = format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
+    String fileName = format("%s-%s", UUID.randomUUID(), file.getOriginalFilename());
     try {
       s3StorageService.save(path, fileName, file);
     } catch (IOException e) {
@@ -72,8 +66,7 @@ public class ShipmentService {
         .orElseThrow(
             () -> new IllegalStateException(format("Shipment %s was not found.", shipmentId)));
 
-    String path = format("%s/%s", BucketName.SHIPMENT_PICTURE.getBucketName(),
-        shipment.getShipmentId());
+    String path = shipment.getShipmentId();
     try {
       return Optional.ofNullable(shipment.getImageLink())
           .map(link -> {
@@ -89,13 +82,6 @@ public class ShipmentService {
     }
   }
 
-
-  private Map<String, String> getMetadata(MultipartFile file) {
-    Map<String, String> metadata = new HashMap<>();
-    metadata.put("Content-Type", file.getContentType());
-    metadata.put("Content-Length", String.valueOf(file.getSize()));
-    return metadata;
-  }
 
   private Shipment getShipment(String shipmentId) {
     return dynamoDBService.getShipment(shipmentId).stream()

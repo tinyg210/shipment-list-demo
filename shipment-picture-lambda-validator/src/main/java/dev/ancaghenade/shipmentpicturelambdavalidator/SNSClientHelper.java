@@ -1,33 +1,31 @@
 package dev.ancaghenade.shipmentpicturelambdavalidator;
 
 import java.io.IOException;
-import java.net.URI;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.sns.SnsClient;
 
-public class S3ClientHelper {
+public class SNSClientHelper {
 
   private static final String ENVIRONMENT = System.getenv("ENVIRONMENT");
   private static PropertiesProvider properties = new PropertiesProvider();
 
-  public static S3Client getS3Client() throws IOException {
+  public static SnsClient getSnsClient() throws IOException {
 
     if (properties.getProperty("environment.dev").equals(ENVIRONMENT)) {
 
-      return S3Client.builder()
-          .region(Region.of(properties.getProperty("s3.region")))
+      return SnsClient.builder()
+          .region(Region.of("eu-central-1"))
           .credentialsProvider(StaticCredentialsProvider.create(
               AwsBasicCredentials.create(properties.getProperty("credentials.access-key"),
                   properties.getProperty("credentials.secret-key"))))
-          .endpointOverride(URI.create(properties.getProperty("s3.endpoint")))
-          .forcePathStyle(true)
+          .endpointOverride(java.net.URI.create("http://localstack:4566/s"))
           .build();
     } else {
-      System.out.println("AWS S3 client is used");
+      System.out.println("AWS SNS client is used");
 
-      return S3Client.builder().build();
+      return SnsClient.builder().build();
     }
   }
 
