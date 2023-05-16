@@ -1,54 +1,64 @@
 package dev.ancaghenade.shipmentlistdemo.repository;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBSaveExpression;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
 import dev.ancaghenade.shipmentlistdemo.entity.Shipment;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.core.pagination.sync.SdkIterable;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 
 @Repository
 public class DynamoDBService {
 
-  private final DynamoDBMapper dynamoDBMapper;
+  private final DynamoDbTable<Shipment> shipmentTable;
 
   @Autowired
-  public DynamoDBService(DynamoDBMapper dynamoDBMapper) {
-    this.dynamoDBMapper = dynamoDBMapper;
+  public DynamoDBService(DynamoDbEnhancedClient dynamoDbClient,
+      DynamoDbTable<Shipment> shipmentTable) {
+    this.shipmentTable = shipmentTable;
   }
 
   public Shipment upsert(Shipment shipment) {
     if (Objects.isNull(shipment.getShipmentId())) {
-      dynamoDBMapper.save(shipment);
-    }
-    Shipment shp = dynamoDBMapper.load(Shipment.class, shipment.getShipmentId());
-    if (Objects.isNull(shp)) {
-      dynamoDBMapper.save(shipment);
+      shipmentTable.putItem(shipment);
     } else {
-      dynamoDBMapper.save(shipment, new DynamoDBSaveExpression().withExpectedEntry("shipmentId",
-          new ExpectedAttributeValue(new AttributeValue()
-              .withS(shipment.getShipmentId()))));
+      shipmentTable.updateItem(shipment);
     }
     return shipment;
   }
 
   public Optional<Shipment> getShipment(String shipmentId) {
-    return Optional.ofNullable(dynamoDBMapper.load(Shipment.class, shipmentId));
+    return Optional.ofNullable(
+        shipmentTable.getItem(Key.builder().partitionValue(shipmentId).build()));
   }
 
   public String delete(String shipmentId) {
-    Shipment shipment = dynamoDBMapper.load(Shipment.class, shipmentId);
-    dynamoDBMapper.delete(shipment);
+    shipmentTable.deleteItem(Key.builder().partitionValue(shipmentId).build());
     return "Shipment has been deleted";
   }
 
   public List<Shipment> getAllShipments() {
-    return dynamoDBMapper.scan(Shipment.class, new DynamoDBScanExpression());
+    ScanEnhancedRequest request = ScanEnhancedRequest.builder().build();
+    SdkIterable<Shipment> shipments = shipmentTable.scan(request).items();
+    return shipments.stream().toList();
   }
 
+  public void removeImageLink(String shipmentId) {
+    Optional.ofNullable(shipmentTable.getItem(Key.builder().partitionValue(shipmentId).build()))
+        .ifPresent(shipment -> shipment.setImageLink(null));
+  }
+
+  public void updateImageLink(String shipmentId, String message) {
+    Optional.ofNullable(shipmentTable.getItem(Key.builder().partitionValue(shipmentId).build()))
+        .ifPresent(shipment -> {
+          shipment.setImageLink(message);
+          shipmentTable.updateItem(shipment);
+        });
+
+  }
 }

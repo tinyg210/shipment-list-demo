@@ -6,4 +6,6 @@ aws:
     endpoint: https://dynamodb.eu-central-1.amazonaws.com
   s3:
     endpoint: https://s3.eu-central-1.amazonaws.com
+  sqs:
+    endpoint: https://sqs.eu-central-1.amazonaws.com
   region: eu-central-1
