@@ -42,7 +42,7 @@ The AWS services involved are:
 - [DynamoDB](https://docs.localstack.cloud/user-guide/aws/dynamodb/) for the entities
 - [Lambda](https://docs.localstack.cloud/user-guide/aws/lambda/) function that will validate the pictures, apply a watermark and replace non-compliant files.
 - [SNS](https://docs.localstack.cloud/user-guide/aws/sns/) that receives update notifications
-- [SQS](https://docs.localstack.cloud/user-guide/aws/lambda/) that subscribes to a topic and delivers the messages to the Spring Boot app
+- [SQS](https://docs.localstack.cloud/user-guide/aws/sqs/) that subscribes to a topic and delivers the messages to the Spring Boot app
 
 
 #### How to use it
@@ -150,7 +150,7 @@ Current available actions using the GUI:
 Files that are not pictures will be deleted
 and the shipment picture will be replaced with a generic icon, because we don't want any trouble.
 
-## Developer environment (Running on LocalStack)
+## Running on LocalStack
 
 
 To switch to using LocalStack instead of AWS services just run `docker compose up` in the root
