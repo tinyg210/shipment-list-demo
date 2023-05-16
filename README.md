@@ -40,10 +40,12 @@ The AWS services involved are:
 
 - [S3](https://docs.localstack.cloud/user-guide/aws/s3/) for storing pictures
 - [DynamoDB](https://docs.localstack.cloud/user-guide/aws/dynamodb/) for the entities
-- [Lambda](https://docs.localstack.cloud/user-guide/aws/lambda/) function that will validate the pictures.
+- [Lambda](https://docs.localstack.cloud/user-guide/aws/lambda/) function that will validate the pictures, apply a watermark and replace non-compliant files.
+- [SNS](https://docs.localstack.cloud/user-guide/aws/sns/) that receives update notifications
+- [SQS](https://docs.localstack.cloud/user-guide/aws/lambda/) that subscribes to a topic and delivers the messages to the Spring Boot app
 
 
-#### How we will be using it
+#### How to use it
 
 We’ll be walking through a few scenarios using the application, and we expect it to maintain the
 behavior in both production and development environments. This behaviour can be "scientifically"
@@ -57,7 +59,7 @@ files, `application-prod.yml`, and  `application-dev.yml`.
 
 ## Instructions
 
-## Production simulation (Running on AWS)
+## Running on AWS
 
 Now, we don’t have a real production environment because that’s not the point here, but most likely,
 an application like this runs on a container orchestration platform, and all the necessary configs
@@ -72,6 +74,10 @@ needs to be created with the following policies:
 - AmazonS3FullAccess
 - AWSLambda_FullAccess
 - AmazonDynamoDBFullAccess
+- AmazonSNSFullAccess
+- AmazonSQSFullAccess
+- AWSLambdaExecute
+- AmazonS3ObjectLambdaExecutionRolePolicy
 
 We will be using the user's credentials and export them as temporary environment variables with the
 `export` (`set` on Windows) command:
@@ -89,10 +95,7 @@ step.
 
 ### Creating resources - running Terraform
 
-Make sure you have Terraform [installed](https://developer.hashicorp.com/terraform/downloads).If
-you're
-not familiar or uncomfortable with Terraform, there's also a branch that uses only AWS cli to create
-resources.
+Make sure you have Terraform [installed](https://developer.hashicorp.com/terraform/downloads)
 
 Under setup/terraform run:
 
@@ -108,7 +111,7 @@ $ terraform apply
 ```
 
 This should create the needed S3 bucket, the DynamoDB `shipment` table and populate it with some
-sample data, and the Lambda function that will help with picture validation.
+sample data, the Lambda function that will help with picture validation, the SQS and SNS.
 
 ### Running the GUI
 
@@ -134,8 +137,8 @@ At `localhost:3000` you should now be able to see a list of shipments with stand
 that means that only the database is populated, the pictures still need to be added from the
 `sample-pictures` folder.
 
-The weight of a shipment we can perceive, but not the size, that's why we need pictures to
-understand,
+The weight of a shipment is already given, but not the size, that's why we need pictures to
+understand it better,
 using the "banana for scale" measuring unit. How else would we know??
 
 Current available actions using the GUI:
@@ -153,6 +156,12 @@ and the shipment picture will be replaced with a generic icon, because we don't 
 To switch to using LocalStack instead of AWS services just run `docker compose up` in the root
 folder
 to spin up a Localstack container.
+
+Before we proceed, make sure you clean up your AWS resources by running
+
+```
+$ terraform destroy
+```
 
 To generate the exact same resources on LocalStack, we need `tflocal`, a thin wrapper script around
 the terraform command line client. `tflocal` takes care of automatically configuring the local
@@ -175,14 +184,13 @@ Usage: terraform [global options] <subcommand> [args]
 ...
 ```
 
-From here on, it's smooth sailing, the same as before. Switch to `setup/tflocal` folder, the files are 
-identical to the ones in `setup/terraform`, but for the newly generated state files, it is a good idea
-to separate these "workspaces":
+From here on, it's smooth sailing, the same as before. In the `setup/terraform` folder, run the `cleanup` script
+to get rid of any files that keep track of the resources' state. Then:
 
 ```
 $ tflocal init
 $ tflocal plan -var 'env=dev
-$ tflocal apply -var 'env=dev'
+$ tflocal apply
 ```
 
 What we're doing here is just passing an environmental variable to let the Lambda

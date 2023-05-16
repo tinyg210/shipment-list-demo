@@ -41,6 +41,10 @@ public class ShipmentService {
     return dynamoDBService.upsert(shipment);
   }
 
+  public void removeImageLink(String shipmentId) {
+    dynamoDBService.removeImageLink(shipmentId);
+  }
+
   public void uploadShipmentImage(String shipmentId, MultipartFile file) {
 
     checkIfFileIsEmpty(file);
@@ -66,12 +70,11 @@ public class ShipmentService {
         .orElseThrow(
             () -> new IllegalStateException(format("Shipment %s was not found.", shipmentId)));
 
-    String path = shipment.getShipmentId();
     try {
       return Optional.ofNullable(shipment.getImageLink())
           .map(link -> {
             try {
-              return s3StorageService.download(path, link);
+              return s3StorageService.download(link);
             } catch (IOException e) {
               throw new RuntimeException(e);
             }
@@ -98,4 +101,7 @@ public class ShipmentService {
   }
 
 
+  public void updateImageLink(String shipmentId, String imageLink) {
+    dynamoDBService.updateImageLink(shipmentId, imageLink);
+  }
 }

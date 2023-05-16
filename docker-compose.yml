@@ -1,16 +1,6 @@
 version: "3.9"
 
 services:
-  ping:
-    image: alpine:3.14
-    container_name: ping
-    tty: true
-    ports:
-      - "127.0.0.1:8081:8081"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
   localstack:
     container_name: localstack
     image: localstack/localstack:latest
@@ -18,11 +8,11 @@ services:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
       - "127.0.0.1:4510-4559:4510-4559"  # external services port range
     environment:
-      - DEBUG=1  # enable more verbose logs
+#      - DEBUG=1  # enable more verbose logs
       - DOCKER_HOST=unix:///var/run/docker.sock #unix socket to communicate with the docker daemon
 #      - LAMBDA_KEEPALIVE_MS=0 # disable lambda keepalive
       - LOCALSTACK_HOST=localstack # where services are available from other containers
-#      - ENFORCE_IAM=1 # enforce IAM policies
+      - ENFORCE_IAM=1 # enforce IAM policies
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"

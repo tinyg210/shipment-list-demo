@@ -26,7 +26,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-
   <!--    Dependencies-->
   <dependencies>
     <dependency>
@@ -41,15 +40,6 @@
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>s3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>software.amazon.awssdk</groupId>
-      <artifactId>sqs</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>software.amazon.awssdk</groupId>
-      <artifactId>sns</artifactId>
     </dependency>
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
@@ -69,17 +59,7 @@
     </dependency>
     <dependency>
       <groupId>io.awspring.cloud</groupId>
-      <artifactId>spring-cloud-starter-aws-messaging</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-websocket</artifactId>
-      <version>3.0.4</version>
-    </dependency>
-    <dependency>
-      <groupId>io.projectreactor</groupId>
-      <artifactId>reactor-core</artifactId>
-      <version>3.5.4</version>
+      <artifactId>spring-cloud-aws-starter-sqs</artifactId>
     </dependency>
 
 
@@ -109,7 +89,7 @@
       <dependency>
         <groupId>io.awspring.cloud</groupId>
         <artifactId>spring-cloud-aws-dependencies</artifactId>
-        <version>2.3.1</version>
+        <version>3.0.0-RC1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

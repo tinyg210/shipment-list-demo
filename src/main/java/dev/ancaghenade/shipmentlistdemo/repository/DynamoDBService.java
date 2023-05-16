@@ -15,13 +15,11 @@ import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 @Repository
 public class DynamoDBService {
 
-  private final DynamoDbEnhancedClient dynamoDbClient;
   private final DynamoDbTable<Shipment> shipmentTable;
 
   @Autowired
   public DynamoDBService(DynamoDbEnhancedClient dynamoDbClient,
       DynamoDbTable<Shipment> shipmentTable) {
-    this.dynamoDbClient = dynamoDbClient;
     this.shipmentTable = shipmentTable;
   }
 
@@ -35,7 +33,8 @@ public class DynamoDBService {
   }
 
   public Optional<Shipment> getShipment(String shipmentId) {
-    return Optional.ofNullable(shipmentTable.getItem(Key.builder().partitionValue(shipmentId).build()));
+    return Optional.ofNullable(
+        shipmentTable.getItem(Key.builder().partitionValue(shipmentId).build()));
   }
 
   public String delete(String shipmentId) {
@@ -49,4 +48,17 @@ public class DynamoDBService {
     return shipments.stream().toList();
   }
 
+  public void removeImageLink(String shipmentId) {
+    Optional.ofNullable(shipmentTable.getItem(Key.builder().partitionValue(shipmentId).build()))
+        .ifPresent(shipment -> shipment.setImageLink(null));
+  }
+
+  public void updateImageLink(String shipmentId, String message) {
+    Optional.ofNullable(shipmentTable.getItem(Key.builder().partitionValue(shipmentId).build()))
+        .ifPresent(shipment -> {
+          shipment.setImageLink(message);
+          shipmentTable.updateItem(shipment);
+        });
+
+  }
 }

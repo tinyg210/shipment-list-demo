@@ -21,7 +21,6 @@ aws:
     endpoint: dummy-s3
   dynamodb:
     endpoint: dummy-dynamodb
-  sns:
-    endpoint: dummy-sns
-    topic: update_shipment_picture_topic
+  sqs:
+    endpoint: dummy-sqs
   region: region

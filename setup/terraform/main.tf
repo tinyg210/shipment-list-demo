@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.52.0"
+      version = "= 4.66.1"
     }
   }
 }
@@ -90,16 +90,6 @@ resource "aws_lambda_permission" "s3_lambda_exec_permission" {
   source_arn    = aws_s3_bucket.shipment_picture_bucket.arn
 }
 
-resource "aws_sns_topic" "update_shipment_picture_topic" {
-  name = "update_shipment_picture_topic"
-}
-
-
-resource "aws_sns_topic_subscription" "example_subscription" {
-  topic_arn = aws_sns_topic.update_shipment_picture_topic.arn
-  protocol  = "https"
-  endpoint  = var.sns_sub_endpoint
-}
 
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"
@@ -124,7 +114,6 @@ resource "aws_iam_role_policy_attachment" "lambda_exec_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
   role       = aws_iam_role.lambda_exec.name
 }
-
 
 
 resource "aws_iam_role_policy" "lambda_exec_policy" {
@@ -160,6 +149,58 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
           ]
           }
           EOF
+}
+
+resource "aws_sns_topic" "update_shipment_picture_topic" {
+  name = "update_shipment_picture_topic"
+}
+
+resource "aws_sqs_queue" "update_shipment_picture_queue" {
+  name = "update_shipment_picture_queue"
+}
+
+resource "aws_sns_topic_subscription" "my_subscription" {
+  topic_arn = aws_sns_topic.update_shipment_picture_topic.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.update_shipment_picture_queue.arn
+}
+
+resource "aws_sqs_queue_policy" "my_queue_policy" {
+  queue_url = aws_sqs_queue.update_shipment_picture_queue.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowSNSSendMessage",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "sqs:SendMessage",
+      "Resource": "${aws_sqs_queue.update_shipment_picture_queue.arn}",
+      "Condition": {
+        "ArnEquals": {
+          "aws:SourceArn": "${aws_sns_topic.update_shipment_picture_topic.arn}"
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_sns_topic_subscription" "my_topic_subscription" {
+  topic_arn = aws_sns_topic.update_shipment_picture_topic.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.update_shipment_picture_queue.arn
+
+  # Additional subscription attributes
+  raw_message_delivery = true
+  filter_policy        = ""
+  delivery_policy      = ""
+
+  # Ensure the subscription is confirmed automatically
+  confirmation_timeout_in_minutes = 1
 }
 
 

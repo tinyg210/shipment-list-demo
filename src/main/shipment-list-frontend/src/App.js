@@ -5,37 +5,10 @@ import './App.css';
 import SSEManager from './SSEManager';
 import placeholder from './placeholder.jpg';
 
-const ShipmentImage = ({shipmentId}) => {
-  const [image, setImage] = useState(null);
-
-  const fetchImage = () => {
-    axios.get(
-        `http://localhost:8081/api/shipment/${shipmentId}/image/download`,
-        {responseType: 'blob'})
-    .then(res => {
-          setImage(URL.createObjectURL(res.data));
-        }
-    )
-    .catch(error => {
-      if (error.response || error.request) {
-        setImage(null);
-      }
-    });
-
-  }
-  useEffect(() => {
-    fetchImage();
-  }, []);
-
-  return (
-      <img src={image ? image : placeholder}/>
-  );
-}
-
 const Shipments = () => {
   const [shipments, setShipments] = useState([]);
   const [isFetchingComplete, setIsFetchingComplete] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0); // Add refreshKey state
+  const [refreshKey, setRefreshKey] = useState(0); // hack0: Add refreshKey state to force refresh
 
   const fetchShipments = () => {
     axios.get("http://localhost:8081/api/shipment").then(res => {
@@ -66,15 +39,16 @@ const Shipments = () => {
     });
   }
 
-  const refreshShipmentPicture = () => {
-    setShipments(shipments);
-    setRefreshKey((prevKey) => prevKey + 1); // Update refreshKey
-
+  const refreshShipmentPicture = (shipmentId) => {
+    if(shipments.some((shp) => shp.shipmentId === shipmentId)) {
+      setShipments(shipments);
+      setRefreshKey((prevKey) => prevKey + 1); // Update refreshKey
+    }
   }
 
   const handleSSEEvent = (data) => {
     if (isFetchingComplete) {
-      refreshShipmentPicture();
+      refreshShipmentPicture(data);
       console.log("Message: " + data);
     }
   }
@@ -98,8 +72,9 @@ const Shipments = () => {
             }}>
               <div>
                 <Dropzone {...shipment}/>
-                <ShipmentImage shipmentId={shipment.shipmentId}
-                               style={{objectFit: "contain"}}/>
+                <img src={`http://localhost:8081/api/shipment/${shipment.shipmentId}/image/download?t=${Date.now()}`} //hack1: cache busting to refresh
+                     alt={placeholder}
+                     style={{objectFit: "contain"}}/>
 
               </div>
 
@@ -179,7 +154,7 @@ function App() {
       <div className="App" style={{
         paddingBottom: "100px"
       }}>
-        <h1>Shipments you are allowed to see based on your account</h1>
+        <h1>Shipments you can see and edit</h1>
         <Shipments/>
       </div>
   );
