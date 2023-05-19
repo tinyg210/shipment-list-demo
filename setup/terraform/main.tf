@@ -10,6 +10,7 @@ provider "aws" {
   region = "eu-central-1"
 }
 
+# S3 bucket
 resource "aws_s3_bucket" "shipment_picture_bucket" {
   bucket        = "shipment-picture-bucket"
   force_destroy = true
@@ -18,6 +19,7 @@ resource "aws_s3_bucket" "shipment_picture_bucket" {
   }
 }
 
+# DynamoDB table creation
 resource "aws_dynamodb_table" "shipment" {
   name           = "shipment"
   read_capacity  = 10
@@ -36,6 +38,7 @@ resource "aws_dynamodb_table" "shipment" {
   stream_view_type = "NEW_AND_OLD_IMAGES"
 }
 
+# Populate the table
 resource "aws_dynamodb_table_item" "shipment" {
   for_each   = local.tf_data
   table_name = aws_dynamodb_table.shipment.name
@@ -43,7 +46,7 @@ resource "aws_dynamodb_table_item" "shipment" {
   item       = jsonencode(each.value)
 }
 
-
+# Define a bucket for the lambda zip
 resource "aws_s3_bucket" "lambda_code_bucket" {
   bucket        = "shipment-picture-lambda-validator-bucket"
   force_destroy = true
@@ -52,12 +55,14 @@ resource "aws_s3_bucket" "lambda_code_bucket" {
   }
 }
 
+# Lambda source code
 resource "aws_s3_bucket_object" "lambda_code" {
   source = "../../shipment-picture-lambda-validator/target/shipment-picture-lambda-validator.jar"
   bucket = aws_s3_bucket.lambda_code_bucket.id
   key    = "shipment-picture-lambda-validator.jar"
 }
 
+# Lambda definition
 resource "aws_lambda_function" "shipment_picture_lambda_validator" {
   function_name = "shipment-picture-lambda-validator"
   handler       = "dev.ancaghenade.shipmentpicturelambdavalidator.ServiceHandler::handleRequest"
@@ -74,6 +79,7 @@ resource "aws_lambda_function" "shipment_picture_lambda_validator" {
   }
 }
 
+# Define trigger for S3
 resource "aws_s3_bucket_notification" "demo_bucket_notification" {
   bucket = aws_s3_bucket.shipment_picture_bucket.id
   lambda_function {
@@ -82,6 +88,7 @@ resource "aws_s3_bucket_notification" "demo_bucket_notification" {
   }
 }
 
+# Give Lambda permission to call S3
 resource "aws_lambda_permission" "s3_lambda_exec_permission" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
@@ -90,7 +97,7 @@ resource "aws_lambda_permission" "s3_lambda_exec_permission" {
   source_arn    = aws_s3_bucket.shipment_picture_bucket.arn
 }
 
-
+# Define role to execute Lambda
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"
 
@@ -110,12 +117,14 @@ resource "aws_iam_role" "lambda_exec" {
 EOF
 }
 
+
+# Attach policy (S3 access) to Lambda role
 resource "aws_iam_role_policy_attachment" "lambda_exec_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
   role       = aws_iam_role.lambda_exec.name
 }
 
-
+# Define IAM role policy that grants permissions to access & process on AWS CloudWatch Logs, S3
 resource "aws_iam_role_policy" "lambda_exec_policy" {
   name = "lambda_exec_policy"
   role = aws_iam_role.lambda_exec.id
@@ -151,20 +160,25 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
           EOF
 }
 
+# Define the topic
 resource "aws_sns_topic" "update_shipment_picture_topic" {
   name = "update_shipment_picture_topic"
 }
 
+# Define the queue
 resource "aws_sqs_queue" "update_shipment_picture_queue" {
   name = "update_shipment_picture_queue"
 }
 
+# Define subscription
 resource "aws_sns_topic_subscription" "my_subscription" {
   topic_arn = aws_sns_topic.update_shipment_picture_topic.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.update_shipment_picture_queue.arn
 }
 
+
+# Define policy to allow SNS to send message to SQS
 resource "aws_sqs_queue_policy" "my_queue_policy" {
   queue_url = aws_sqs_queue.update_shipment_picture_queue.id
 
@@ -189,13 +203,14 @@ resource "aws_sqs_queue_policy" "my_queue_policy" {
 EOF
 }
 
+# Define the SQS subscription
 resource "aws_sns_topic_subscription" "my_topic_subscription" {
   topic_arn = aws_sns_topic.update_shipment_picture_topic.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.update_shipment_picture_queue.arn
 
   # Additional subscription attributes
-  raw_message_delivery = true
+#  raw_message_delivery = true
   filter_policy        = ""
   delivery_policy      = ""
 
