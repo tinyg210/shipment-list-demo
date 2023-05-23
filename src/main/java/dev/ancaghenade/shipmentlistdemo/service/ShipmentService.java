@@ -2,17 +2,13 @@ package dev.ancaghenade.shipmentlistdemo.service;
 
 import static java.lang.String.format;
 
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import dev.ancaghenade.shipmentlistdemo.buckets.BucketName;
 import dev.ancaghenade.shipmentlistdemo.entity.Shipment;
-import dev.ancaghenade.shipmentlistdemo.repository.S3StorageService;
 import dev.ancaghenade.shipmentlistdemo.repository.DynamoDBService;
+import dev.ancaghenade.shipmentlistdemo.repository.S3StorageService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +34,15 @@ public class ShipmentService {
   }
 
   public String deleteShipment(String shipmentId) {
-   return dynamoDBService.delete(shipmentId);
+    return dynamoDBService.delete(shipmentId);
   }
 
   public Shipment saveShipment(Shipment shipment) {
     return dynamoDBService.upsert(shipment);
+  }
+
+  public void removeImageLink(String shipmentId) {
+    dynamoDBService.removeImageLink(shipmentId);
   }
 
   public void uploadShipmentImage(String shipmentId, MultipartFile file) {
@@ -51,15 +51,12 @@ public class ShipmentService {
 
     Shipment shipment = getShipment(shipmentId);
 
-    Map<String, String> metadata = getMetadata(file);
+    String path = shipment.getShipmentId();
 
-    String path = format("%s/%s", BucketName.SHIPMENT_PICTURE.getBucketName(),
-        shipment.getShipmentId());
-
-    String fileName = format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
+    String fileName = format("%s-%s", UUID.randomUUID(), file.getOriginalFilename());
     try {
-      s3StorageService.save(path, fileName, file.getInputStream(), Optional.of(metadata));
-    } catch (IOException | AmazonS3Exception e) {
+      s3StorageService.save(path, fileName, file);
+    } catch (IOException e) {
       throw new IllegalStateException(e);
     }
     shipment.setImageLink(fileName);
@@ -73,24 +70,21 @@ public class ShipmentService {
         .orElseThrow(
             () -> new IllegalStateException(format("Shipment %s was not found.", shipmentId)));
 
-    String path = format("%s/%s", BucketName.SHIPMENT_PICTURE.getBucketName(),
-        shipment.getShipmentId());
     try {
       return Optional.ofNullable(shipment.getImageLink())
-          .map(link -> s3StorageService.download(path, link))
+          .map(link -> {
+            try {
+              return s3StorageService.download(link);
+            } catch (IOException e) {
+              throw new RuntimeException(e);
+            }
+          })
           .orElse(Files.readAllBytes(new File("src/main/resources/placeholder.jpg").toPath()));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-
-  private Map<String, String> getMetadata(MultipartFile file) {
-    Map<String, String> metadata = new HashMap<>();
-    metadata.put("Content-Type", file.getContentType());
-    metadata.put("Content-Length", String.valueOf(file.getSize()));
-    return metadata;
-  }
 
   private Shipment getShipment(String shipmentId) {
     return dynamoDBService.getShipment(shipmentId).stream()
@@ -107,4 +101,7 @@ public class ShipmentService {
   }
 
 
+  public void updateImageLink(String shipmentId, String imageLink) {
+    dynamoDBService.updateImageLink(shipmentId, imageLink);
+  }
 }

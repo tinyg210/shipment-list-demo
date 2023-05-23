@@ -1,92 +1,160 @@
 package dev.ancaghenade.shipmentpicturelambdavalidator;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.S3Event;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.event.S3EventNotification.S3EventNotificationRecord;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.jayway.jsonpath.JsonPath;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.io.OutputStream;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import javax.imageio.ImageIO;
 import org.apache.http.entity.ContentType;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sns.model.PublishRequest;
 
-// Should be something more interesting
 
-public class ServiceHandler implements RequestHandler<S3Event, Void> {
+public class ServiceHandler implements RequestStreamHandler {
 
-  public Void handleRequest(S3Event event, Context context) {
+  private static final String BUCKET_NAME = "shipment-picture-bucket";
 
-    AmazonS3 s3Client = null;
+  public ServiceHandler() {
+  }
+
+  @Override
+  public void handleRequest(InputStream inputStream, OutputStream outputStream,
+      Context context) throws IOException {
+    var isValid = true;
+
+    var s3Client = acquireS3Client();
+    var snsClient = acquireSnsClient();
+    var objectKey = getObjectKey(inputStream, context);
+
+    if (Objects.isNull(objectKey)) {
+      context.getLogger().log("Object key is null");
+      return;
+    }
+
+    context.getLogger().log("Object key: " + objectKey);
+
+    var getObjectRequest = GetObjectRequest.builder()
+        .bucket(BUCKET_NAME)
+        .key(objectKey)
+        .build();
+
+    var s3ObjectResponse = s3Client.getObject(
+        getObjectRequest);
+
+    context.getLogger().log("Object fetched");
+
+    // Check if the image was already processed
+    if (s3ObjectResponse.response().metadata().entrySet().stream().anyMatch(
+        entry -> entry.getKey().equals("exclude-lambda") && entry.getValue().equals("true"))) {
+      context.getLogger().log("Object already present.");
+      return;
+    }
+
+    // Check the file extension to determine the image format
+    if (!List.of(ContentType.IMAGE_JPEG.getMimeType(),
+            ContentType.IMAGE_PNG.getMimeType(),
+            ContentType.IMAGE_BMP.getMimeType())
+        .contains(s3ObjectResponse.response().contentType())) {
+      isValid = false;
+      context.getLogger().log("Object invalid due to wrong format.");
+
+    }
+
+    // Get the object data as a byte array
+    var objectData = s3Client.getObject(getObjectRequest).readAllBytes();
+
+    if (!isValid) {
+      try {
+        File imageFile = new File("placeholder.jpg");
+        BufferedImage image = ImageIO.read(imageFile);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", baos);
+        byte[] imageBytes = baos.toByteArray();
+
+        objectKey = TextParser.replaceSufix(objectKey, "placeholder.jpg");
+
+        System.out.println("NEW IMAGE LINK: " + objectKey);
+
+        var putObjectRequest = PutObjectRequest.builder()
+            .bucket(BUCKET_NAME)
+            .key(objectKey)
+            .metadata(Collections.singletonMap("exclude-lambda", "true"))
+            .build();
+
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(imageBytes));
+
+        baos.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+    } else {
+      var extension = s3ObjectResponse.response().contentType();
+
+      var putObjectRequest = PutObjectRequest.builder()
+          .bucket(BUCKET_NAME)
+          .key(objectKey)
+          .metadata(Collections.singletonMap("exclude-lambda", "true"))
+          .build();
+
+      s3Client.putObject(putObjectRequest, RequestBody.fromBytes(
+          Watermark.watermarkImage(objectData,
+              extension.substring(extension.lastIndexOf("/") + 1))));
+      context.getLogger().log("Watermark has been added.");
+    }
+    var request = PublishRequest
+        .builder()
+        .message(objectKey)
+        .topicArn(SNSClientHelper.topicARN())
+        .build();
+    snsClient.publish(request);
+    context.getLogger().log("Published to topic: " + request.topicArn());
+
+    // Close clients
+    s3Client.close();
+    snsClient.close();
+
+  }
+
+  private String getObjectKey(InputStream inputStream, Context context) {
     try {
-      s3Client = S3ClientHelper.getS3Client();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
-    LambdaLogger logger = context.getLogger();
-    boolean isValid = true;
-
-    // check if record is there
-    if (event.getRecords().isEmpty()) {
-      logger.log("No records received.");
-      return null;
-    }
-
-    for (S3EventNotificationRecord record : event.getRecords()) {
-      String bucketName = record.getS3().getBucket().getName();
-      String objectKey = record.getS3().getObject().getKey();
-
-      S3Object s3Object = s3Client.getObject(bucketName, objectKey);
-
-      if (!List.of(ContentType.IMAGE_JPEG.getMimeType(),
-              ContentType.IMAGE_PNG.getMimeType(),
-              ContentType.IMAGE_BMP.getMimeType())
-          .contains(s3Object.getObjectMetadata().getUserMetadata().get("content-type"))) {
-
-        isValid = false;
-        logger.log(
-            "File format not accepted. This will be replaced with a standard placeholder.");
+      List<String> keys = JsonPath.read(inputStream, "$.Records[*].s3.object.key");
+      if (keys.iterator().hasNext()) {
+        return keys.iterator().next();
       }
-      if (isValid) {
-        byte[] magicNumbers = new byte[4];
-        InputStream objectData = s3Object.getObjectContent();
-        try {
-          objectData.read(magicNumbers, 0, 4);
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-        if (Arrays.equals(magicNumbers, new byte[]{(byte) 0x7f, 'E', 'L', 'F'})) {
-          logger.log("The object is an ELF executable file.");
-          isValid = false;
-
-        } else if (Arrays.equals(magicNumbers, new byte[]{'M', 'Z'})) {
-          logger.log("The object is a Windows executable file.");
-          isValid = false;
-
-        }
-      }
-      if (!isValid) {
-        s3Client.deleteObject(bucketName, objectKey);
-
-        InputStream is = ServiceHandler.class.getResourceAsStream("/resources/placeholder.jpg");
-        if (is == null) {
-          is = ServiceHandler.class.getClassLoader().getResourceAsStream("placeholder.jpg");
-        }
-
-        s3Client.putObject(new PutObjectRequest(bucketName, objectKey, is, new ObjectMetadata()));
-
-      } else {
-        logger.log(
-            "Found image with content type: " + s3Object.getObjectMetadata().getUserMetadata()
-                .get("content-type") + " that is correct.");
-      }
-
+    } catch (IOException ioe) {
+      context.getLogger().log("caught IOException reading input stream");
     }
     return null;
   }
+
+  private S3Client acquireS3Client() {
+    try {
+      return S3ClientHelper.getS3Client();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private SnsClient acquireSnsClient() {
+    try {
+      return SNSClientHelper.getSnsClient();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
+

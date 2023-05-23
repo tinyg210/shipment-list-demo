@@ -26,4 +26,8 @@ public class PropertiesProvider {
     }
     return null;
   }
+
+  public String getProperty(String key) throws IOException {
+    return values().getProperty(key);
+  }
 }

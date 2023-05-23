@@ -22,12 +22,9 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
-<!--    <checkstyle.version>10.5.0</checkstyle.version>-->
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <com.amazonaws.s3-sdk>1.12.376</com.amazonaws.s3-sdk>
   </properties>
-
 
   <!--    Dependencies-->
   <dependencies>
@@ -41,14 +38,16 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-s3</artifactId>
-      <version>${com.amazonaws.s3-sdk}</version>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-dynamodb</artifactId>
-      <version>1.12.383</version>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>dynamodb-enhanced</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>dynamodb</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -58,16 +57,46 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-logging</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.awspring.cloud</groupId>
+      <artifactId>spring-cloud-aws-starter-sqs</artifactId>
+    </dependency>
+
+
     <!--     Test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20220924</version>
+    </dependency>
+
   </dependencies>
 
-  <build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>2.20.26</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.awspring.cloud</groupId>
+        <artifactId>spring-cloud-aws-dependencies</artifactId>
+        <version>3.0.0-RC1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
+  <build>
     <finalName>shipment-list-demo</finalName>
     <resources>
       <resource>

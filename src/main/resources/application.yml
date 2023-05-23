@@ -1,6 +1,7 @@
 server:
   port: 8081
 
+# limit size of received files
 spring:
   servlet:
     multipart:
@@ -8,18 +9,8 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
-
+# log everything
 logging:
   level:
     root=debug:
 
-# override by profile configs
-aws:
-  credentials:
-    access-key:
-    secret-key:
-  s3:
-    endpoint: dummy-s3
-  dynamodb:
-    endpoint: dummy-dynamodb
-  region: region
