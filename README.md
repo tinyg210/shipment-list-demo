@@ -217,7 +217,7 @@ $ tflocal apply
 What we're doing here is just passing an environmental variable to let the Lambda
 know this is the `dev` environment.
 
-### Running the backend
+### Starting the backend
 
 After that, the Spring Boot application needs to start using the dev profile (make sure you're in
 the
@@ -226,6 +226,7 @@ root folder):
 ```
 $ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
+### Using the application
 
 Go back to `localhost:3000` and a new list will be available; notice that the functionalities of
 the application have not changed.
