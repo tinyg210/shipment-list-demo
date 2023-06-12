@@ -1,30 +1,29 @@
 package dev.ancaghenade.shipmentpicturelambdavalidator;
 
-import java.io.IOException;
 import java.net.URI;
-import software.amazon.awssdk.regions.Region;
+import java.util.Objects;
 import software.amazon.awssdk.services.sns.SnsClient;
 
 public class SNSClientHelper {
 
-  private static final String ENVIRONMENT = System.getenv("ENVIRONMENT");
-  private static PropertiesProvider properties = new PropertiesProvider();
-
+  private static final String LOCALSTACK_HOSTNAME = System.getenv("LOCALSTACK_HOSTNAME");
   private static String snsTopicArn;
 
-  public static SnsClient getSnsClient() throws IOException {
+  public static SnsClient getSnsClient() {
 
     var clientBuilder = SnsClient.builder();
 
-    if (properties.getProperty("environment.dev").equals(ENVIRONMENT)) {
-      snsTopicArn = properties.getProperty("sns.arn.dev");
+    if (Objects.nonNull(LOCALSTACK_HOSTNAME)) {
+      snsTopicArn = String.format("arn:aws:sns:%s:000000000000:update_shipment_picture_topic",
+          Location.REGION.getRegion());
 
       return clientBuilder
-          .region(Region.of(properties.getProperty("aws.region")))
-          .endpointOverride(URI.create(properties.getProperty("sns.endpoint")))
+          .region(Location.REGION.getRegion())
+          .endpointOverride(URI.create(String.format("http://%s:4566", LOCALSTACK_HOSTNAME)))
           .build();
     } else {
-      snsTopicArn = properties.getProperty("sns.arn.prod");
+      snsTopicArn = String.format("arn:aws:sns:%s:%s:update_shipment_picture_topic",
+          Location.REGION.getRegion(), "932043840972");
       return clientBuilder.build();
     }
   }

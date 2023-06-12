@@ -7,12 +7,21 @@ terraform {
   }
 }
 provider "aws" {
-  region = "eu-central-1"
+  region = "us-east-1"
+}
+
+provider "random" {
+  version = "3.1.0"
+}
+
+resource "random_pet" "random_name" {
+  length    = 2
+  separator = "-"
 }
 
 # S3 bucket
 resource "aws_s3_bucket" "shipment_picture_bucket" {
-  bucket        = "shipment-picture-bucket"
+  bucket        = "shipment-picture-bucket-${random_pet.random_name.id}"
   force_destroy = true
   lifecycle {
     prevent_destroy = false
@@ -48,7 +57,7 @@ resource "aws_dynamodb_table_item" "shipment" {
 
 # Define a bucket for the lambda zip
 resource "aws_s3_bucket" "lambda_code_bucket" {
-  bucket        = "shipment-picture-lambda-validator-bucket"
+  bucket        = "shipment-picture-lambda-validator-bucket-${random_pet.random_name.id}"
   force_destroy = true
   lifecycle {
     prevent_destroy = false
@@ -57,7 +66,7 @@ resource "aws_s3_bucket" "lambda_code_bucket" {
 
 # Lambda source code
 resource "aws_s3_bucket_object" "lambda_code" {
-  source = "../../shipment-picture-lambda-validator/target/shipment-picture-lambda-validator.jar"
+  source = "../shipment-picture-lambda-validator/target/shipment-picture-lambda-validator.jar"
   bucket = aws_s3_bucket.lambda_code_bucket.id
   key    = "shipment-picture-lambda-validator.jar"
 }
@@ -74,7 +83,7 @@ resource "aws_lambda_function" "shipment_picture_lambda_validator" {
   timeout       = 60
   environment {
     variables = {
-      ENVIRONMENT = var.env
+      BUCKET = aws_s3_bucket.shipment_picture_bucket.bucket
     }
   }
 }
@@ -150,8 +159,8 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
               "sns:Publish"
             ],
             "Resource": [
-              "arn:aws:s3:::shipment-picture-bucket",
-              "arn:aws:s3:::shipment-picture-bucket/*",
+              "arn:aws:s3:::shipment-picture-bucket-${random_pet.random_name.id}",
+              "arn:aws:s3:::shipment-picture-bucket-${random_pet.random_name.id}/*",
               "${aws_sns_topic.update_shipment_picture_topic.arn}"
             ]
           }
@@ -216,6 +225,17 @@ resource "aws_sns_topic_subscription" "my_topic_subscription" {
 
   # Ensure the subscription is confirmed automatically
   confirmation_timeout_in_minutes = 1
+}
+
+# save generated bucket name to properties file
+resource "local_file" "properties_file" {
+  content = <<-EOT
+    shipment-picture-bucket=${aws_s3_bucket.shipment_picture_bucket.bucket}
+    shipment-picture-bucket-validator=${aws_s3_bucket.lambda_code_bucket.bucket}
+  EOT
+  depends_on = [aws_s3_bucket.shipment_picture_bucket]
+
+  filename = "../src/main/resources/buckets.properties"
 }
 
 

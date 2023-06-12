@@ -2,22 +2,20 @@ package dev.ancaghenade.shipmentpicturelambdavalidator;
 
 import java.io.IOException;
 import java.net.URI;
-import software.amazon.awssdk.regions.Region;
+import java.util.Objects;
 import software.amazon.awssdk.services.s3.S3Client;
 
 public class S3ClientHelper {
 
-  private static final String ENVIRONMENT = System.getenv("ENVIRONMENT");
-  private static PropertiesProvider properties = new PropertiesProvider();
+  private static final String LOCALSTACK_HOSTNAME = System.getenv("LOCALSTACK_HOSTNAME");
 
   public static S3Client getS3Client() throws IOException {
 
     var clientBuilder = S3Client.builder();
-    if (properties.getProperty("environment.dev").equals(ENVIRONMENT)) {
-
+    if (Objects.nonNull(LOCALSTACK_HOSTNAME)) {
       return clientBuilder
-          .region(Region.of(properties.getProperty("aws.region")))
-          .endpointOverride(URI.create(properties.getProperty("s3.endpoint")))
+          .region(Location.REGION.getRegion())
+          .endpointOverride(URI.create(String.format("http://%s:4566", LOCALSTACK_HOSTNAME)))
           .forcePathStyle(true)
           .build();
     } else {

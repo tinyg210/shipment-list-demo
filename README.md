@@ -11,6 +11,14 @@
 | __Works on__     | LocalStack v2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 
+### UPDATE
+
+The Terraform configuration file now randomly generates names for the bucket, in order to avoid conflicts
+at a global scale on AWS. This name shall be written out to a properties file, which the app will pick up
+and use for the S3 client. Furthermore, the name is also passed as an environment variable to the Lambda function by Terraform,
+so there's no need to worry about managing it.
+
+
 ## Introduction
 
 This application was created for demonstration purposes to highlight the ease of switching from
@@ -137,7 +145,7 @@ $ export AWS_SECRET_ACCESS_KEY=[your_aws_secret_access_key_id]
 
 Make sure you have Terraform [installed](https://developer.hashicorp.com/terraform/downloads)
 
-Under setup/terraform run:
+Under `terraform` run:
 
 ```
 $ terraform init
@@ -210,12 +218,12 @@ to get rid of any files that keep track of the resources' state. Then:
 
 ```
 $ tflocal init
-$ tflocal plan -var 'env=dev'
+$ tflocal plan
 $ tflocal apply
 ```
 
-What we're doing here is just passing an environmental variable to let the Lambda
-know this is the `dev` environment.
+We run the exact same commands for the exact same file. We no longer need to pass any environment 
+variables, since the bucket name is generated and passed by Terraform.
 
 ### Starting the backend
 
