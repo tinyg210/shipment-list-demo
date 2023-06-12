@@ -34,6 +34,7 @@ public class ShipmentService {
   }
 
   public String deleteShipment(String shipmentId) {
+    s3StorageService.delete(shipmentId);
     return dynamoDBService.delete(shipmentId);
   }
 
@@ -59,12 +60,12 @@ public class ShipmentService {
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }
-    shipment.setImageLink(fileName);
+    shipment.setImageLink(format("%s/%s", path, fileName));
     dynamoDBService.upsert(shipment);
   }
 
 
-  public byte[] downloadShipmentImage(String shipmentId) {
+  public byte[] downloadShipmentImage(String shipmentId) throws IllegalStateException {
     Shipment shipment = dynamoDBService.getShipment(shipmentId).stream()
         .findFirst()
         .orElseThrow(

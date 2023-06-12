@@ -39,6 +39,7 @@ public class DynamoDBService {
 
   public String delete(String shipmentId) {
     shipmentTable.deleteItem(Key.builder().partitionValue(shipmentId).build());
+
     return "Shipment has been deleted";
   }
 
