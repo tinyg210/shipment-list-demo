@@ -178,7 +178,7 @@ You can now interact with the application using the React app. All services used
 running on the real AWS cloud.
 
 
-Before moving on, make sure you clean up your AWS resources by running (also in setup/terraform):
+Before moving on, make sure you clean up your AWS resources by running (also in the `terraform` folder):
 
 ```
 $ terraform destroy
@@ -213,7 +213,7 @@ Usage: terraform [global options] <subcommand> [args]
 ...
 ```
 
-From here on, it's the same as using AWS. In the `setup/terraform` folder, run the `cleanup` script
+From here on, it's the same as using AWS. In the `terraform` folder, run the `cleanup` script
 to get rid of any files that keep track of the resources' state. Then:
 
 ```
