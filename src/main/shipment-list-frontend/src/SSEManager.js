@@ -5,7 +5,7 @@ const SSEManager = ({ onEvent, onError }) => {
 
   useEffect(() => {
     // Create the SSE connection
-    eventSourceRef.current = new EventSource('http://localhost:8081/push-endpoint');
+    eventSourceRef.current = new EventSource('https://${process.env.BACKEND_API_HOST}/push-endpoint');
 
     // Event listener for SSE messages
     eventSourceRef.current.onmessage = (event) => {
