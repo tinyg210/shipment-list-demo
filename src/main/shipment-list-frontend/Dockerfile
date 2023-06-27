@@ -5,8 +5,6 @@ ENV BACKEND_API_HOST $BACKEND_API_HOST
 
 WORKDIR ./
 
-ENV NODE_ENV="production"
-
 COPY src/main/shipment-list-frontend/package*.json ./
 RUN npm install
 

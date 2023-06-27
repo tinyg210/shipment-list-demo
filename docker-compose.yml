@@ -17,8 +17,10 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
 
   shipment-list-backend:
+    depends_on:
+      - localstack
     build:
-      dockerfile: Dockerfile-backend
+      dockerfile: Dockerfile
     environment:
       - BACKEND_PORT=8081
       - SPRING_PROFILES_ACTIVE=dev
@@ -27,7 +29,7 @@ services:
 
   shipment-list-frontend:
     build:
-      dockerfile: Dockerfile-frontend
+      dockerfile: src/main/shipment-list-frontend/Dockerfile
     environment:
       - BACKEND_API_HOST=http://shipment-list-backend:8081
     ports:
