@@ -10,12 +10,28 @@ services:
     environment:
       - DEBUG=1  # enable more verbose logs
       - DOCKER_HOST=unix:///var/run/docker.sock #unix socket to communicate with the docker daemon
-#      - LAMBDA_KEEPALIVE_MS=0 # disable lambda keepalive
       - LOCALSTACK_HOST=localstack # where services are available from other containers
       - ENFORCE_IAM=1 # enforce IAM policies
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+
+  shipment-list-backend:
+    build:
+      dockerfile: Dockerfile-backend
+    environment:
+      - BACKEND_PORT=8081
+      - SPRING_PROFILES_ACTIVE=dev
+    ports:
+      - "8081:8081"
+
+  shipment-list-frontend:
+    build:
+      dockerfile: Dockerfile-frontend
+    environment:
+      - BACKEND_API_HOST=http://shipment-list-backend:8081
+    ports:
+      - "3000:3000"
 
 networks:
   ls:

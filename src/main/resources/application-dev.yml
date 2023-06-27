@@ -3,9 +3,9 @@ aws:
     access-key: test_access_key
     secret-key: test_secret_access_key
   s3:
-    endpoint: http://s3.localhost.localstack.cloud:4566/
+    endpoint: http://localstack:4566/
   dynamodb:
-    endpoint: http://localhost.localstack.cloud:4566/
+    endpoint: http://localstack:4566/
   sqs:
-    endpoint: http://localhost:4566/000000000000
+    endpoint: http://localstack:4566/000000000000
   region: us-east-1

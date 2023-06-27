@@ -1,14 +1,16 @@
-FROM node:16
+FROM node:16-alpine
 
 ARG BACKEND_API_HOST
 ENV BACKEND_API_HOST $BACKEND_API_HOST
 
-WORKDIR /usr/src/app
+WORKDIR ./
 
-COPY package*.json ./
+ENV NODE_ENV="production"
+
+COPY src/main/shipment-list-frontend/package*.json ./
 RUN npm install
 
-COPY . .
+COPY src/main/shipment-list-frontend ./
 RUN npm run build
 
 # Make port 3000 available for the app

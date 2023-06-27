@@ -58,10 +58,13 @@ src/main/shipment-list-frontend/yarn-error.log*
 
 # terraform
 
-setup/terraform/terraform.tfstate
-setup/terraform/.terraform.lock.hcl
-setup/terraform/terraform.tfstate.backup
+terraform/terraform.tfstate
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate.backup
 
 # lambda module
 /shipment-picture-lambda-validator/.idea
 /shipment-picture-lambda-validator/target/
+
+# docker compose volumes
+/volume
