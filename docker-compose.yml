@@ -29,6 +29,8 @@ services:
       - "8081:8081"
 
   shipment-list-frontend:
+    labels:
+      shipyard.route: '/'
     build:
       dockerfile: src/main/shipment-list-frontend/Dockerfile
       context: '.'
