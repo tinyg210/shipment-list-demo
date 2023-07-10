@@ -13,6 +13,9 @@ services:
       - LOCALSTACK_HOST=localstack # where services are available from other containers
       - ENFORCE_IAM=1 # enforce IAM policies
     volumes:
+      - "terraform/run-tf.sh:/etc/localstack/init/ready.d/run-tf.sh"
+      - "terraform/locals.tf:/etc/localstack/init/ready.d/locals.tf"
+      - "terraform/main.tf:/etc/localstack/init/ready.d/main.tf"
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
 
@@ -29,8 +32,8 @@ services:
       - "8081:8081"
 
   shipment-list-frontend:
-    labels:
-      shipyard.route: '/'
+#    labels:
+#      shipyard.route: '/'
     build:
       dockerfile: src/main/shipment-list-frontend/Dockerfile
       context: '.'
