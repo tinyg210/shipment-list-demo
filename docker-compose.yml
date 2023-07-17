@@ -48,6 +48,8 @@ services:
     build:
       dockerfile: src/main/shipment-list-frontend/Dockerfile
       context: '.'
+      args:
+        - BACKEND_API_HOST=http://shipment-list-backend:8081
     environment:
       - BACKEND_API_HOST=http://shipment-list-backend:8081
     ports:
