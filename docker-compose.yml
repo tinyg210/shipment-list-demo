@@ -14,6 +14,7 @@ services:
       - DOCKER_HOST=unix:///var/run/docker.sock #unix socket to communicate with the docker daemon
       - LOCALSTACK_HOST=localstack # where services are available from other containers
       - ENFORCE_IAM=1 # enforce IAM policies
+      - LAMBDA_DOCKER_NETWORK=ls_network
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
