@@ -1,3 +1,4 @@
+
 rm .terraform.lock.hcl
 rm -rf .terraform
 rm terraform.tfstate

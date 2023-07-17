@@ -4,11 +4,51 @@ terraform {
       source  = "hashicorp/aws"
       version = "= 4.66.1"
     }
+#    docker = {
+#      source = "kreuzwerker/docker"
+#      version = ">= 2.10.0"
+#    }
   }
 }
 provider "aws" {
-  region = "us-east-1"
+  access_key                  = "test"
+  secret_key                  = "test"
+  region                      = "us-east-1"
+  s3_use_path_style           = true
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
+
+  endpoints {
+    apigateway     = "http://localstack:4566"
+    apigatewayv2   = "http://localstack:4566"
+    cloudformation = "http://localstack:4566"
+    cloudwatch     = "http://localstack:4566"
+    dynamodb       = "http://localstack:4566"
+    ec2            = "http://localstack:4566"
+    es             = "http://localstack:4566"
+    elasticache    = "http://localstack:4566"
+    firehose       = "http://localstack:4566"
+    iam            = "http://localstack:4566"
+    kinesis        = "http://localstack:4566"
+    lambda         = "http://localstack:4566"
+    rds            = "http://localstack:4566"
+    redshift       = "http://localstack:4566"
+    route53        = "http://localstack:4566"
+    s3             = "http://localstack:4566"
+    secretsmanager = "http://localstack:4566"
+    ses            = "http://localstack:4566"
+    sns            = "http://localstack:4566"
+    sqs            = "http://localstack:4566"
+    ssm            = "http://localstack:4566"
+    stepfunctions  = "http://localstack:4566"
+    sts            = "http://localstack:4566"
+  }
 }
+
+#provider "docker" {
+#  host = "tcp://localstack:4566/"
+#}
 
 provider "random" {
   version = "3.1.0"
@@ -66,7 +106,7 @@ resource "aws_s3_bucket" "lambda_code_bucket" {
 
 # Lambda source code
 resource "aws_s3_bucket_object" "lambda_code" {
-  source = "../shipment-picture-lambda-validator/target/shipment-picture-lambda-validator.jar"
+  source = "shipment-picture-lambda-validator.jar"
   bucket = aws_s3_bucket.lambda_code_bucket.id
   key    = "shipment-picture-lambda-validator.jar"
 }

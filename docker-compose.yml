@@ -2,6 +2,8 @@ version: "3.9"
 
 services:
   localstack:
+    networks:
+      - ls_network
     container_name: localstack
     image: localstack/localstack:latest
     ports:
@@ -13,15 +15,24 @@ services:
       - LOCALSTACK_HOST=localstack # where services are available from other containers
       - ENFORCE_IAM=1 # enforce IAM policies
     volumes:
-      - "/terraform/run-tf.sh:/etc/localstack/init/ready.d/run-tf.sh"
-      - "/terraform/locals.tf:/etc/localstack/init/ready.d/locals.tf"
-      - "/terraform/main.tf:/etc/localstack/init/ready.d/main.tf"
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
-
+  terraform:
+    networks:
+      - ls_network
+    build:
+      context: .
+      dockerfile: ./terraform/Dockerfile
+    environment:
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_ACCESS_KEY_ID=test
+    volumes:
+      - ./terraform:/app
   shipment-list-backend:
     depends_on:
       - localstack
+    networks:
+      - ls_network
     build:
       dockerfile: Dockerfile
       context: '.'
@@ -32,8 +43,8 @@ services:
       - "8081:8081"
 
   shipment-list-frontend:
-#    labels:
-#      shipyard.route: '/'
+    labels:
+      shipyard.route: '/'
     build:
       dockerfile: src/main/shipment-list-frontend/Dockerfile
       context: '.'
@@ -41,7 +52,9 @@ services:
       - BACKEND_API_HOST=http://shipment-list-backend:8081
     ports:
       - "3000:3000"
+    networks:
+      - ls_network
 
 networks:
-  ls:
-    name: ls
+  ls_network:
+    name: ls_network
